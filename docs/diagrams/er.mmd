@@ -1,0 +1,42 @@
+erDiagram
+    DEPARTMENTS ||--o{ USERS : contains
+    USERS ||--o{ EXIT_REQUESTS : submits
+    EXIT_REQUESTS ||--o{ APPROVALS : receives
+    USERS ||--o{ APPROVALS : makes
+    EXIT_REQUESTS ||--o{ CLEARANCE_TASKS : creates
+
+    DEPARTMENTS {
+        int id PK
+        string name
+    }
+    USERS {
+        int id PK
+        string full_name
+        string email UK
+        string password_hash
+        string role
+        int department_id FK
+    }
+    EXIT_REQUESTS {
+        int id PK
+        int employee_id FK
+        string reason
+        date requested_last_working_date
+        string comments
+        string status
+        datetime created_at
+    }
+    APPROVALS {
+        int id PK
+        int exit_request_id FK
+        int approver_id FK
+        string decision
+        string comment
+        datetime decided_at
+    }
+    CLEARANCE_TASKS {
+        int id PK
+        int exit_request_id FK
+        string task_name
+        string status
+    }
