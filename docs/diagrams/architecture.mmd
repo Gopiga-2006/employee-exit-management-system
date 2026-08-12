@@ -1,0 +1,7 @@
+flowchart LR
+    U[Employee / HR Browser] --> F[React + Bootstrap Frontend]
+    F -->|Axios REST API| B[FastAPI Backend]
+    B --> A[JWT + bcrypt Authentication]
+    B --> O[SQLAlchemy ORM]
+    O --> D[(MySQL 8 Database)]
+    B --> S[Future Email Service]
