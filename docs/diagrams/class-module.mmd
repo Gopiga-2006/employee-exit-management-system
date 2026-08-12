@@ -1,0 +1,43 @@
+classDiagram
+    class User {
+        +id
+        +full_name
+        +email
+        +role
+    }
+    class Department {
+        +id
+        +name
+    }
+    class ExitRequest {
+        +id
+        +reason
+        +requested_last_working_date
+        +status
+    }
+    class Approval {
+        +id
+        +decision
+        +comment
+    }
+    class ClearanceTask {
+        +id
+        +task_name
+        +status
+    }
+    class AuthService {
+        +register_user()
+        +authenticate_user()
+        +issue_token()
+    }
+    class ExitService {
+        +create_exit_request()
+        +approve_or_reject()
+        +dashboard_counts()
+    }
+    User --> Department
+    User --> ExitRequest
+    ExitRequest --> Approval
+    ExitRequest --> ClearanceTask
+    AuthService --> User
+    ExitService --> ExitRequest
