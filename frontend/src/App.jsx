@@ -10,70 +10,20 @@ function Login({ onLogin }) {
   const [loading, setLoading] = useState(false)
 
   async function submit(event) {
-    event.preventDefault()
-    setError('')
-    setLoading(true)
-    try {
-      const path = registerMode ? '/api/v1/auth/register' : '/api/v1/auth/login'
-      const body = registerMode ? { full_name: name, email, password } : { email, password }
-      const response = await api.post(path, body)
-      const data = response.data.data
-      localStorage.setItem('token', data.access_token)
-      localStorage.setItem('role', data.role)
-      localStorage.setItem('name', data.full_name)
-      onLogin(data)
-    } catch (err) {
-      setError(err.response?.data?.detail || 'Request failed')
-    } finally {
-      setLoading(false)
-    }
+    event.preventDefault(); setError(''); setLoading(true)
+    try { const path = registerMode ? '/api/v1/auth/register' : '/api/v1/auth/login'; const body = registerMode ? { full_name: name, email, password } : { email, password }; const response = await api.post(path, body); const data = response.data.data; localStorage.setItem('token', data.access_token); localStorage.setItem('role', data.role); localStorage.setItem('name', data.full_name); onLogin(data) }
+    catch (err) { setError(err.response?.data?.detail || 'Request failed') } finally { setLoading(false) }
   }
 
-  return (
-    <div className="container py-5"><div className="row justify-content-center"><div className="col-md-6 col-lg-4"><div className="card shadow-sm"><div className="card-body p-4">
-      <h3 className="mb-1">Employee Exit System</h3><p className="text-muted">Review-I MVP</p>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={submit}>
-        {registerMode && <><label className="form-label">Full Name</label><input className="form-control mb-3" value={name} onChange={(e) => setName(e.target.value)} required /></>}
-        <label className="form-label">Email</label><input className="form-control mb-3" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <label className="form-label">Password</label><input className="form-control mb-3" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength="6" />
-        <button className="btn btn-primary w-100" disabled={loading}>{loading ? 'Please wait...' : registerMode ? 'Create Employee Account' : 'Login'}</button>
-      </form>
-      <button className="btn btn-link w-100 mt-2" disabled={loading} onClick={() => { setRegisterMode(!registerMode); setError('') }}>{registerMode ? 'Already have an account? Login' : 'New employee? Create account'}</button>
-      <hr /><small className="text-muted">Demo HR: hr@example.com / Hr@12345</small>
-    </div></div></div></div></div>
-  )
+  return <div className="container py-5"><div className="row justify-content-center"><div className="col-md-6 col-lg-4"><div className="card shadow-sm"><div className="card-body p-4"><h3 className="mb-1">Employee Exit System</h3><p className="text-muted">Review-I MVP</p>{error && <div className="alert alert-danger">{error}</div>}<form onSubmit={submit}>{registerMode && <><label className="form-label">Full Name</label><input className="form-control mb-3" value={name} onChange={(e) => setName(e.target.value)} required /></>}<label className="form-label">Email</label><input className="form-control mb-3" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /><label className="form-label">Password</label><input className="form-control mb-3" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength="6" /><button className="btn btn-primary w-100" disabled={loading}>{loading ? 'Please wait...' : registerMode ? 'Create Employee Account' : 'Login'}</button></form><button className="btn btn-link w-100 mt-2" disabled={loading} onClick={() => { setRegisterMode(!registerMode); setError('') }}>{registerMode ? 'Already have an account? Login' : 'New employee? Create account'}</button><hr /><small className="text-muted">Demo HR: hr@example.com / Hr@12345</small></div></div></div></div></div>
 }
 
 function EmployeeDashboard() {
-  const [requests, setRequests] = useState([])
-  const [form, setForm] = useState({ reason: '', requested_last_working_date: '', comments: '' })
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [loadError, setLoadError] = useState('')
-  async function loadRequests() {
-    setLoadError('')
-    try { const response = await api.get('/api/v1/exit-requests/mine'); setRequests(response.data.data) }
-    catch (err) { setLoadError(err.response?.data?.detail || 'Could not load your requests') }
-    finally { setLoading(false) }
-  }
+  const [requests, setRequests] = useState([]); const [form, setForm] = useState({ reason: '', requested_last_working_date: '', comments: '' }); const [message, setMessage] = useState(''); const [loading, setLoading] = useState(true); const [submitting, setSubmitting] = useState(false); const [loadError, setLoadError] = useState('')
+  async function loadRequests() { setLoadError(''); try { const response = await api.get('/api/v1/exit-requests/mine'); setRequests(response.data.data) } catch (err) { setLoadError(err.response?.data?.detail || 'Could not load your requests') } finally { setLoading(false) } }
   useEffect(() => { loadRequests() }, [])
-  async function submit(event) {
-    event.preventDefault(); setMessage(''); setSubmitting(true)
-    try { const response = await api.post('/api/v1/exit-requests', form); setMessage(response.data.message); setForm({ reason: '', requested_last_working_date: '', comments: '' }); await loadRequests() }
-    catch (err) { setMessage(err.response?.data?.detail || 'Could not submit request') }
-    finally { setSubmitting(false) }
-  }
-  return <main className="container py-4"><h2>Employee Dashboard</h2><p className="text-muted">Welcome, {localStorage.getItem('name')}</p>{message && <div className="alert alert-info">{message}</div>}
-    <div className="card mb-4 shadow-sm"><div className="card-body"><h5>Submit Exit Request</h5><form onSubmit={submit} className="row g-3">
-      <div className="col-md-6"><label className="form-label">Reason</label><input className="form-control" minLength="5" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} required /></div>
-      <div className="col-md-6"><label className="form-label">Last Working Date</label><input className="form-control" type="date" min={new Date().toISOString().split('T')[0]} value={form.requested_last_working_date} onChange={(e) => setForm({ ...form, requested_last_working_date: e.target.value })} required /></div>
-      <div className="col-12"><label className="form-label">Comments</label><textarea className="form-control" value={form.comments} onChange={(e) => setForm({ ...form, comments: e.target.value })} /></div>
-      <div className="col-12"><button className="btn btn-primary" disabled={submitting}>{submitting ? 'Submitting...' : 'Submit Request'}</button></div></form></div></div>
-    <div className="card shadow-sm"><div className="card-body"><div className="d-flex justify-content-between align-items-center"><h5>My Requests</h5><button className="btn btn-sm btn-outline-secondary" onClick={loadRequests} disabled={loading}>Refresh</button></div>{loadError && <div className="alert alert-danger mt-3">{loadError}</div>}{loading ? <p className="text-muted mt-3">Loading requests...</p> : <div className="table-responsive"><table className="table align-middle"><thead><tr><th>ID</th><th>Reason</th><th>Last Date</th><th>Status</th></tr></thead><tbody>
-      {requests.length === 0 ? <tr><td colSpan="4" className="text-muted">No exit requests yet.</td></tr> : requests.map((item) => <tr key={item.id}><td>#{item.id}</td><td>{item.reason}</td><td>{item.requested_last_working_date}</td><td><span className={`badge text-bg-${item.status === 'approved' ? 'success' : item.status === 'rejected' ? 'danger' : 'warning'}`}>{item.status}</span></td></tr>)}
-    </tbody></table></div>}</div></div></main>
+  async function submit(event) { event.preventDefault(); setMessage(''); setSubmitting(true); try { const response = await api.post('/api/v1/exit-requests', form); setMessage(response.data.message); setForm({ reason: '', requested_last_working_date: '', comments: '' }); await loadRequests() } catch (err) { setMessage(err.response?.data?.detail || 'Could not submit request') } finally { setSubmitting(false) } }
+  return <main className="container py-4"><h2>Employee Dashboard</h2><p className="text-muted">Welcome, {localStorage.getItem('name')}</p>{message && <div className="alert alert-info">{message}</div>}<div className="card mb-4 shadow-sm"><div className="card-body"><h5>Submit Exit Request</h5><form onSubmit={submit} className="row g-3"><div className="col-md-6"><label className="form-label">Reason</label><input className="form-control" minLength="5" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} required /></div><div className="col-md-6"><label className="form-label">Last Working Date</label><input className="form-control" type="date" min={new Date().toISOString().split('T')[0]} value={form.requested_last_working_date} onChange={(e) => setForm({ ...form, requested_last_working_date: e.target.value })} required /></div><div className="col-12"><label className="form-label">Comments</label><textarea className="form-control" value={form.comments} onChange={(e) => setForm({ ...form, comments: e.target.value })} /></div><div className="col-12"><button className="btn btn-primary" disabled={submitting}>{submitting ? 'Submitting...' : 'Submit Request'}</button></div></form></div></div><div className="card shadow-sm"><div className="card-body"><div className="d-flex justify-content-between align-items-center"><h5>My Requests</h5><button className="btn btn-sm btn-outline-secondary" onClick={loadRequests} disabled={loading}>Refresh</button></div>{loadError && <div className="alert alert-danger mt-3">{loadError}</div>}{loading ? <p className="text-muted mt-3">Loading requests...</p> : <div className="table-responsive"><table className="table align-middle"><thead><tr><th>ID</th><th>Reason</th><th>Last Date</th><th>Status</th></tr></thead><tbody>{requests.length === 0 ? <tr><td colSpan="4" className="text-muted">No exit requests yet.</td></tr> : requests.map((item) => <tr key={item.id}><td>#{item.id}</td><td>{item.reason}</td><td>{item.requested_last_working_date}</td><td><span className={`badge text-bg-${item.status === 'approved' ? 'success' : item.status === 'rejected' ? 'danger' : 'warning'}`}>{item.status}</span></td></tr>)}</tbody></table></div>}</div></div></main>
 }
 
 function HRDashboard() {
@@ -81,17 +31,7 @@ function HRDashboard() {
   async function load() { setLoadError(''); try { const [requestsResponse, dashboardResponse] = await Promise.all([api.get('/api/v1/exit-requests'), api.get('/api/v1/exit-requests/dashboard')]); setRequests(requestsResponse.data.data); setCounts(dashboardResponse.data.data) } catch (err) { setLoadError(err.response?.data?.detail || 'Could not load HR dashboard') } finally { setLoading(false) } }
   useEffect(() => { load() }, [])
   async function decide(id, decision) { setActionId(id); try { await api.patch(`/api/v1/exit-requests/${id}/decision`, { decision, comment: `Decision made by HR: ${decision}` }); setMessage(`Request #${id} ${decision}.`); await load() } catch (err) { setMessage(err.response?.data?.detail || 'Could not update request') } finally { setActionId(null) } }
-  return <main className="container py-4"><h2>HR Dashboard</h2><p className="text-muted">Welcome, {localStorage.getItem('name')}</p>{message && <div className="alert alert-info">{message}</div>}{loadError && <div className="alert alert-danger">{loadError}</div>}
-    <div className="row g-3 mb-4">{Object.entries(counts).map(([key, value]) => <div className="col-md-4" key={key}><div className="card shadow-sm"><div className="card-body"><div className="text-muted text-capitalize">{key}</div><div className="display-6">{value}</div></div></div></div>)}</div>
-    <div className="card shadow-sm"><div className="card-body"><div className="d-flex justify-content-between align-items-center"><h5>Exit Requests</h5><button className="btn btn-sm btn-outline-secondary" onClick={load} disabled={loading}>Refresh</button></div>{loading ? <p className="text-muted mt-3">Loading requests...</p> : <div className="table-responsive"><table className="table align-middle"><thead><tr><th>ID</th><th>Employee</th><th>Reason</th><th>Last Date</th><th>Status</th><th>Action</th></tr></thead><tbody>
-      {requests.length === 0 ? <tr><td colSpan="6" className="text-muted">No exit requests found.</td></tr> : requests.map((item) => <tr key={item.id}><td>#{item.id}</td><td>{item.employee_name}</td><td>{item.reason}</td><td>{item.requested_last_working_date}</td><td>{item.status}</td><td>{item.status === 'pending' ? <div className="btn-group"><button className="btn btn-sm btn-success" disabled={actionId !== null} onClick={() => decide(item.id, 'approved')}>{actionId === item.id ? 'Saving...' : 'Approve'}</button><button className="btn btn-sm btn-outline-danger" disabled={actionId !== null} onClick={() => decide(item.id, 'rejected')}>Reject</button></div> : '-'}</td></tr>)}
-    </tbody></table></div>}</div></div></main>
+  return <main className="container py-4"><h2>HR Dashboard</h2><p className="text-muted">Welcome, {localStorage.getItem('name')}</p>{message && <div className="alert alert-info">{message}</div>}{loadError && <div className="alert alert-danger">{loadError}</div>}<div className="row g-3 mb-4">{Object.entries(counts).map(([key, value]) => <div className="col-md-4" key={key}><div className="card shadow-sm"><div className="card-body"><div className="text-muted text-capitalize">{key}</div><div className="display-6">{value}</div></div></div></div>)}</div><div className="card shadow-sm"><div className="card-body"><div className="d-flex justify-content-between align-items-center"><h5>Exit Requests</h5><button className="btn btn-sm btn-outline-secondary" onClick={load} disabled={loading}>Refresh</button></div>{loading ? <p className="text-muted mt-3">Loading requests...</p> : <div className="table-responsive"><table className="table align-middle"><thead><tr><th>ID</th><th>Employee</th><th>Reason</th><th>Last Date</th><th>Status</th><th>Action</th></tr></thead><tbody>{requests.length === 0 ? <tr><td colSpan="6" className="text-muted">No exit requests found.</td></tr> : requests.map((item) => <tr key={item.id}><td>#{item.id}</td><td>{item.employee_name}</td><td>{item.reason}</td><td>{item.requested_last_working_date}</td><td>{item.status}</td><td>{item.status === 'pending' ? <div className="btn-group"><button className="btn btn-sm btn-success" disabled={actionId !== null} onClick={() => decide(item.id, 'approved')}>{actionId === item.id ? 'Saving...' : 'Approve'}</button><button className="btn btn-sm btn-outline-danger" disabled={actionId !== null} onClick={() => decide(item.id, 'rejected')}>Reject</button></div> : '-'}</td></tr>)}</tbody></table></div>}</div></div></main>
 }
 
-export default function App() {
-  const [loggedIn, setLoggedIn] = useState(Boolean(localStorage.getItem('token'))); const [role, setRole] = useState(localStorage.getItem('role'))
-  function onLogin(data) { setLoggedIn(true); setRole(data.role) }
-  function logout() { localStorage.clear(); setLoggedIn(false); setRole(null) }
-  if (!loggedIn) return <Login onLogin={onLogin} />
-  return <><nav className="navbar bg-white border-bottom"><div className="container"><span className="navbar-brand fw-semibold">Employee Exit Management</span><button className="btn btn-outline-secondary btn-sm" onClick={logout}>Logout</button></div></nav>{role === 'hr' || role === 'admin' ? <HRDashboard /> : <EmployeeDashboard />}</>
-}
+export default function App() { const [loggedIn, setLoggedIn] = useState(Boolean(localStorage.getItem('token'))); const [role, setRole] = useState(localStorage.getItem('role')); function onLogin(data) { setLoggedIn(true); setRole(data.role) } function logout() { localStorage.clear(); setLoggedIn(false); setRole(null) } if (!loggedIn) return <Login onLogin={onLogin} />; return <><nav className="navbar bg-white border-bottom"><div className="container"><span className="navbar-brand fw-semibold">Employee Exit Management</span><button className="btn btn-outline-secondary btn-sm" onClick={logout}>Logout</button></div></nav>{role === 'hr' || role === 'admin' ? <HRDashboard /> : <EmployeeDashboard />}</> }
