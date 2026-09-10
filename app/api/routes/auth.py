@@ -12,20 +12,22 @@ from app.services.auth_service import authenticate_user, create_user
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
-@router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def signup(payload: UserCreate, db: Session = Depends(get_db)) -> User:
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
+def signup(payload: UserCreate, db: Session = Depends(get_db)) -> dict:
     """Register a new user."""
     existing = db.query(User).filter(User.email == payload.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return create_user(db, payload.name, payload.email, payload.password, payload.role)
+    user = create_user(db, payload.name, payload.email, payload.password, payload.role)
+    return {"success": True, "data": UserResponse.model_validate(user).model_dump(), "message": "User registered"}
 
 
-@router.post("/login", response_model=TokenResponse)
-def login(payload: UserLogin, db: Session = Depends(get_db)) -> TokenResponse:
+@router.post("/login")
+def login(payload: UserLogin, db: Session = Depends(get_db)) -> dict:
     """Authenticate a user and issue a signed access token."""
     user = authenticate_user(db, payload.email, payload.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
     token = create_access_token(user.id, user.role)
-    return TokenResponse(access_token=token, user=user)
+    data = TokenResponse(access_token=token, user=user).model_dump()
+    return {"success": True, "data": data, "message": "Login successful"}
