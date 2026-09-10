@@ -1,0 +1,6 @@
+flowchart TB
+    Core[Core] --> Routers[API Routers]
+    Routers --> Services[Service Layer]
+    Services --> Models[ORM Models]
+    Services --> Schemas[Pydantic Schemas]
+    Models --> Database[MySQL Database]

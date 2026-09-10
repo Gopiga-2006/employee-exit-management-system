@@ -1,0 +1,41 @@
+Table users {
+  id int [pk]
+  name varchar
+  email varchar [unique]
+  password_hash varchar
+  role varchar
+}
+Table exit_requests {
+  id int [pk]
+  employee_id int [ref: > users.id]
+  reason text
+  last_working_day date
+  status varchar
+}
+Table exit_approvals {
+  id int [pk]
+  request_id int [ref: > exit_requests.id]
+  approver_id int [ref: > users.id]
+  decision varchar
+  remarks text
+}
+Table exit_interviews {
+  id int [pk]
+  request_id int [ref: > exit_requests.id]
+  interview_date date
+  feedback text
+}
+Table clearance_tasks {
+  id int [pk]
+  request_id int [ref: > exit_requests.id]
+  assigned_to int [ref: > users.id]
+  task varchar
+  status varchar
+}
+Table audit_logs {
+  id int [pk]
+  user_id int [ref: > users.id]
+  action varchar
+  entity varchar
+  created_at datetime
+}
