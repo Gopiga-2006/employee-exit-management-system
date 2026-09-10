@@ -2,7 +2,6 @@
 
 ## Health
 - `GET /api/health`
-- Returns the service status.
 
 ## Authentication
 - `POST /api/auth/signup`
@@ -15,5 +14,14 @@
 
 ## Exit Approvals
 - `POST /api/approvals/{request_id}` for HR users
+
+## Exit Interviews
+- `POST /api/interviews/{request_id}` for HR users
+- `GET /api/interviews/{request_id}` for HR users
+
+## Clearance Tasks
+- `POST /api/clearance-tasks/{request_id}` for HR users
+- `GET /api/clearance-tasks/{request_id}` for HR users
+- `PUT /api/clearance-tasks/{task_id}` for HR users
 
 FastAPI publishes the interactive API documentation at `/docs` when the backend is running.
