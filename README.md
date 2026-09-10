@@ -49,7 +49,6 @@ Screenshots will be added after the main frontend screens are completed.
 
 ### Backend
 ```text
-cd backend
 python -m venv venv
 pip install -r requirements.txt
 uvicorn app.main:app --reload
