@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.api.dependencies import get_current_user
 from app.core.database import get_db
 from app.core.security import create_access_token
 from app.models.entities import User
@@ -31,3 +32,10 @@ def login(payload: UserLogin, db: Session = Depends(get_db)) -> dict:
     token = create_access_token(user.id, user.role)
     data = TokenResponse(access_token=token, user=user).model_dump()
     return {"success": True, "data": data, "message": "Login successful"}
+
+
+@router.get("/me")
+def get_profile(user: User = Depends(get_current_user)) -> dict:
+    """Return the profile represented by the current access token."""
+    data = UserResponse.model_validate(user).model_dump()
+    return {"success": True, "data": data, "message": "Profile retrieved"}
