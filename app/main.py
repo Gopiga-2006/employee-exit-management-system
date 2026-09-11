@@ -1,6 +1,7 @@
 """FastAPI application entry point."""
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.approvals import router as approvals_router
 from app.api.routes.auth import router as auth_router
@@ -11,6 +12,14 @@ from app.core.database import Base, engine
 from app.models.entities import AuditLog, ClearanceTask, ExitApproval, ExitInterview, ExitRequest, User
 
 app = FastAPI(title="Employee Exit Management System", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
