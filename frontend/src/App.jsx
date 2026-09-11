@@ -1,6 +1,10 @@
 import { useState } from "react";
 import api from "./services/api";
 
+function getErrorMessage(err, fallback) {
+  return err.response?.data?.detail || err.response?.data?.message || err.message || fallback;
+}
+
 function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -8,13 +12,14 @@ function Login({ onLogin }) {
 
   async function submit(event) {
     event.preventDefault();
+    setError("");
     try {
       const response = await api.post("/api/auth/login", { email, password });
       const result = response.data.data;
       localStorage.setItem("access_token", result.access_token);
       onLogin(result.user);
     } catch (err) {
-      setError(err.response?.data?.detail || "Login failed");
+      setError(getErrorMessage(err, "Login failed"));
     }
   }
 
@@ -32,12 +37,25 @@ function Login({ onLogin }) {
 function Signup({ onSignup }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "employee" });
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   async function submit(event) {
     event.preventDefault();
-    await api.post("/api/auth/signup", form);
-    setMessage("Account created. You can sign in now.");
-    onSignup();
+    setMessage("");
+    setError("");
+    setLoading(true);
+    try {
+      await api.post("/api/auth/signup", form);
+      setMessage("Account created. You can sign in now.");
+      onSignup();
+    } catch (err) {
+      setError(getErrorMessage(err, "Account could not be created"));
+    } finally {
+      setLoading(false);
+    }
   }
+
   return (
     <form className="card p-4 mx-auto auth-card" onSubmit={submit}>
       <h2>Register</h2>
@@ -49,8 +67,11 @@ function Signup({ onSignup }) {
         <option value="hr">HR Executive</option>
         <option value="admin">HR Administrator</option>
       </select>
-      <button className="btn btn-outline-primary" type="submit">Create Account</button>
+      <button className="btn btn-outline-primary" type="submit" disabled={loading}>
+        {loading ? "Creating..." : "Create Account"}
+      </button>
       {message && <div className="alert alert-success mt-3 mb-0">{message}</div>}
+      {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
     </form>
   );
 }
