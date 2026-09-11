@@ -12,13 +12,7 @@ Not available during the initial development stage.
 The system gives employees a structured way to submit exit requests and view their progress. HR users can review requests, manage approvals, record exit interviews, and track clearance activities. The application uses a React frontend, FastAPI backend, and MySQL database.
 
 ## Architecture Diagram
-```mermaid
-flowchart LR
-    Client[React.js Frontend] --> API[FastAPI REST API]
-    API --> DB[MySQL 8]
-    API --> Auth[JWT Authentication]
-    API --> Workflow[Exit Workflow Services]
-```
+![System Architecture](docs/diagrams/system-architecture.svg)
 
 Detailed diagrams are available in `docs/diagrams/`, including the architecture, entity relationship, class, and module diagrams.
 
