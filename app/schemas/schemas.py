@@ -57,6 +57,12 @@ class ApprovalCreate(BaseModel):
     remarks: str | None = None
 
 
+class ApprovalUpdate(BaseModel):
+    """Request body for updating an HR approval decision."""
+    decision: str
+    remarks: str | None = None
+
+
 class ApprovalResponse(BaseModel):
     """Approval data returned by the API."""
     model_config = ConfigDict(from_attributes=True)

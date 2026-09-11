@@ -61,3 +61,17 @@ def update_task(
     db.refresh(task)
     data = ClearanceTaskResponse.model_validate(task).model_dump()
     return {"success": True, "data": data, "message": "Clearance task updated"}
+
+
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_roles("hr", "admin")),
+) -> None:
+    """Delete a clearance task from an exit request."""
+    task = db.get(ClearanceTask, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Clearance task not found")
+    db.delete(task)
+    db.commit()

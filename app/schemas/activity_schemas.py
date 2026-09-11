@@ -11,6 +11,12 @@ class InterviewCreate(BaseModel):
     feedback: str
 
 
+class InterviewUpdate(BaseModel):
+    """Request body for updating an exit interview."""
+    interview_date: date
+    feedback: str
+
+
 class InterviewResponse(BaseModel):
     """Exit interview data returned by the API."""
     model_config = ConfigDict(from_attributes=True)

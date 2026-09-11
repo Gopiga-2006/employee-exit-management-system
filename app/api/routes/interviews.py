@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import require_roles
 from app.core.database import get_db
 from app.models.entities import ExitInterview, ExitRequest, User
-from app.schemas.activity_schemas import InterviewCreate, InterviewResponse
+from app.schemas.activity_schemas import InterviewCreate, InterviewResponse, InterviewUpdate
 
 router = APIRouter(prefix="/api/interviews", tags=["Exit Interviews"])
 
@@ -48,3 +48,22 @@ def get_interview(
         raise HTTPException(status_code=404, detail="Exit interview not found")
     data = InterviewResponse.model_validate(interview).model_dump()
     return {"success": True, "data": data, "message": "Exit interview retrieved"}
+
+
+@router.put("/{request_id}")
+def update_interview(
+    request_id: int,
+    payload: InterviewUpdate,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_roles("hr", "admin")),
+) -> dict:
+    """Update the interview recorded for an exit request."""
+    interview = db.query(ExitInterview).filter(ExitInterview.request_id == request_id).first()
+    if not interview:
+        raise HTTPException(status_code=404, detail="Exit interview not found")
+    interview.interview_date = payload.interview_date
+    interview.feedback = payload.feedback
+    db.commit()
+    db.refresh(interview)
+    data = InterviewResponse.model_validate(interview).model_dump()
+    return {"success": True, "data": data, "message": "Exit interview updated"}
