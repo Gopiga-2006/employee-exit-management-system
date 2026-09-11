@@ -4,7 +4,7 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost:3306/employee_exit")
 JWT_SECRET = os.getenv("JWT_SECRET", "change_this_local_secret")
