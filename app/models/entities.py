@@ -1,5 +1,7 @@
 """SQLAlchemy models for the exit workflow."""
 
+from __future__ import annotations
+
 from datetime import date, datetime
 
 from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text
