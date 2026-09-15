@@ -113,23 +113,56 @@ function EmployeeDashboard() {
 
 function HrDashboard() {
   const [requests, setRequests] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  async function loadRequests() {
-    const response = await api.get("/api/exit-requests/all");
-    setRequests(response.data.data);
+  async function loadDashboard() {
+    setError("");
+    try {
+      const [requestResponse, dashboardResponse] = await Promise.all([
+        api.get("/api/exit-requests/all"),
+        api.get("/api/dashboard"),
+      ]);
+      setRequests(requestResponse.data.data);
+      setDashboard(dashboardResponse.data.data);
+    } catch (err) {
+      setError(getErrorMessage(err, "Dashboard could not be loaded"));
+    }
   }
 
   async function processRequest(id, decision) {
-    await api.post(`/api/approvals/${id}`, { decision, remarks: "Processed by HR" });
-    setMessage(`Request #${id} processed.`);
-    await loadRequests();
+    try {
+      await api.post(`/api/approvals/${id}`, { decision, remarks: "Processed by HR" });
+      setMessage(`Request #${id} processed.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(getErrorMessage(err, "Request could not be processed"));
+    }
   }
+
+  const statusCounts = dashboard?.status_counts || {};
+  const workflowSummary = dashboard?.workflow_summary || {};
 
   return (
     <section>
-      <button className="btn btn-outline-secondary mb-3" onClick={loadRequests}>Refresh Exit Requests</button>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>HR Exit Dashboard</h2>
+        <button className="btn btn-outline-secondary" onClick={loadDashboard}>Refresh Dashboard</button>
+      </div>
+      {error && <div className="alert alert-danger">{error}</div>}
       {message && <div className="alert alert-success">{message}</div>}
+      <div className="row g-3 mb-4">
+        <div className="col-md-4"><div className="card p-3 h-100"><div className="text-secondary">Pending</div><div className="display-6">{statusCounts.Pending || 0}</div></div></div>
+        <div className="col-md-4"><div className="card p-3 h-100"><div className="text-secondary">Approved</div><div className="display-6">{statusCounts.Approved || 0}</div></div></div>
+        <div className="col-md-4"><div className="card p-3 h-100"><div className="text-secondary">Rejected</div><div className="display-6">{statusCounts.Rejected || 0}</div></div></div>
+      </div>
+      <div className="row g-3 mb-4">
+        <div className="col-md-4"><div className="card p-3"><strong>Pending clearances</strong><div>{workflowSummary.pending_clearances || 0}</div></div></div>
+        <div className="col-md-4"><div className="card p-3"><strong>Interviews recorded</strong><div>{workflowSummary.interviews_recorded || 0}</div></div></div>
+        <div className="col-md-4"><div className="card p-3"><strong>Approvals recorded</strong><div>{workflowSummary.approvals_recorded || 0}</div></div></div>
+      </div>
+      <h3>Exit Requests</h3>
       {requests.map((request) => (
         <div className="card p-3 mb-3" key={request.id}>
           <strong>Request #{request.id}</strong>
