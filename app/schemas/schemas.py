@@ -1,6 +1,6 @@
 """Request and response models for the REST API."""
 
-from datetime import date, datetime
+from datetime import date
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 

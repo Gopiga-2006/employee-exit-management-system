@@ -6,7 +6,11 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import require_roles
 from app.core.database import get_db
 from app.models.entities import ClearanceTask, ExitRequest, User
-from app.schemas.activity_schemas import ClearanceTaskCreate, ClearanceTaskResponse, ClearanceTaskUpdate
+from app.schemas.activity_schemas import (
+    ClearanceTaskCreate,
+    ClearanceTaskResponse,
+    ClearanceTaskUpdate,
+)
 
 router = APIRouter(prefix="/api/clearance-tasks", tags=["Clearance Tasks"])
 

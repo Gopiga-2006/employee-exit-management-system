@@ -10,7 +10,6 @@ from app.api.routes.dashboard import router as dashboard_router
 from app.api.routes.exit_requests import router as exit_requests_router
 from app.api.routes.interviews import router as interviews_router
 from app.core.database import Base, engine
-from app.models.entities import AuditLog, ClearanceTask, ExitApproval, ExitInterview, ExitRequest, User
 
 app = FastAPI(title="Employee Exit Management System", version="1.0.0")
 

@@ -6,7 +6,11 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import require_roles
 from app.core.database import get_db
 from app.models.entities import ExitInterview, ExitRequest, User
-from app.schemas.activity_schemas import InterviewCreate, InterviewResponse, InterviewUpdate
+from app.schemas.activity_schemas import (
+    InterviewCreate,
+    InterviewResponse,
+    InterviewUpdate,
+)
 
 router = APIRouter(prefix="/api/interviews", tags=["Exit Interviews"])
 
