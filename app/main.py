@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.approvals import router as approvals_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.clearance import router as clearance_router
+from app.api.routes.dashboard import router as dashboard_router
 from app.api.routes.exit_requests import router as exit_requests_router
 from app.api.routes.interviews import router as interviews_router
 from app.core.database import Base, engine
@@ -27,6 +28,7 @@ app.include_router(exit_requests_router)
 app.include_router(approvals_router)
 app.include_router(interviews_router)
 app.include_router(clearance_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/api/health")
