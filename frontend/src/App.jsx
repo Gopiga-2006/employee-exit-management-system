@@ -143,6 +143,9 @@ function HrDashboard() {
 
   const statusCounts = dashboard?.status_counts || {};
   const workflowSummary = dashboard?.workflow_summary || {};
+  const pendingActions = dashboard?.pending_actions || [];
+  const recentRequests = dashboard?.recent_requests || [];
+  const exitProgress = dashboard?.exit_progress || [];
 
   return (
     <section>
@@ -162,6 +165,54 @@ function HrDashboard() {
         <div className="col-md-4"><div className="card p-3"><strong>Interviews recorded</strong><div>{workflowSummary.interviews_recorded || 0}</div></div></div>
         <div className="col-md-4"><div className="card p-3"><strong>Approvals recorded</strong><div>{workflowSummary.approvals_recorded || 0}</div></div></div>
       </div>
+
+      <div className="row g-4 mb-4">
+        <div className="col-lg-6">
+          <div className="card p-4 h-100">
+            <h3>Pending Actions</h3>
+            {pendingActions.length === 0 ? <p className="text-secondary mb-0">No pending actions.</p> : pendingActions.map((action, index) => (
+              <div className="border-bottom py-2" key={`${action.request_id}-${action.action}-${index}`}>
+                <strong>Request #{action.request_id}</strong>
+                <div>{action.action}</div>
+                <span className="badge text-bg-warning">{action.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="col-lg-6">
+          <div className="card p-4 h-100">
+            <h3>Recent Exit Requests</h3>
+            {recentRequests.length === 0 ? <p className="text-secondary mb-0">No recent exit requests.</p> : recentRequests.map((request) => (
+              <div className="border-bottom py-2" key={request.request_id}>
+                <strong>Request #{request.request_id}</strong>
+                <div>{request.employee}</div>
+                <div>Last working day: {request.last_working_day}</div>
+                <span className="badge text-bg-secondary">{request.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="card p-4 mb-4">
+        <h3>Exit Progress</h3>
+        {exitProgress.length === 0 ? <p className="text-secondary mb-0">No exit progress to display.</p> : exitProgress.map((progress) => (
+          <div className="border-bottom py-3" key={progress.request_id}>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <strong>Request #{progress.request_id} — {progress.employee}</strong>
+              <span className="badge text-bg-secondary">{progress.status}</span>
+            </div>
+            <div className="row g-2 small">
+              <div className="col-md-2">Submitted: {progress.submitted ? "Yes" : "No"}</div>
+              <div className="col-md-2">Approval: {progress.approval_recorded ? "Recorded" : "Pending"}</div>
+              <div className="col-md-2">Interview: {progress.interview_recorded ? "Recorded" : "Pending"}</div>
+              <div className="col-md-3">Clearance: {progress.clearance_completed ? "Completed" : "Pending"}</div>
+              <div className="col-md-3">Exit completed: {progress.completed ? "Yes" : "No"}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <h3>Exit Requests</h3>
       {requests.map((request) => (
         <div className="card p-3 mb-3" key={request.id}>
