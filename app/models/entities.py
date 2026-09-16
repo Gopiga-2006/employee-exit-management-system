@@ -16,7 +16,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(150), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(30), default="employee")
-    exit_requests: Mapped[list["ExitRequest"]] = relationship(back_populates="employee")
+    exit_requests: Mapped[list[ExitRequest]] = relationship(back_populates="employee")
 
 
 class ExitRequest(Base):
@@ -28,9 +28,9 @@ class ExitRequest(Base):
     last_working_day: Mapped[date] = mapped_column(Date)
     status: Mapped[str] = mapped_column(String(30), default="Pending")
     employee: Mapped[User] = relationship(back_populates="exit_requests")
-    approvals: Mapped[list["ExitApproval"]] = relationship(back_populates="request")
-    interview: Mapped["ExitInterview | None"] = relationship(back_populates="request", uselist=False)
-    clearance_tasks: Mapped[list["ClearanceTask"]] = relationship(back_populates="request")
+    approvals: Mapped[list[ExitApproval]] = relationship(back_populates="request")
+    interview: Mapped[ExitInterview | None] = relationship(back_populates="request", uselist=False)
+    clearance_tasks: Mapped[list[ClearanceTask]] = relationship(back_populates="request")
 
 
 class ExitApproval(Base):
