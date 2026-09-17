@@ -3,10 +3,11 @@
 Employee Exit Management System is a full-stack application for submitting, reviewing, approving, and tracking employee exit requests.
 
 ## Live Demo
-Not available during the initial development stage.
+- Frontend: https://employee-exit-management-system.vercel.app
+- Backend: https://employee-exit-management-system-ez72.onrender.com
 
 ## Video Demo
-Not available during the initial development stage.
+To be added.
 
 ## Overview
 The system gives employees a structured way to submit exit requests and view their progress. HR users can review requests, manage approvals, record exit interviews, and track clearance activities. The application uses a React frontend, FastAPI backend, and MySQL database.
@@ -39,9 +40,10 @@ Detailed diagrams are available in `docs/diagrams/`, including the architecture,
 - Manage exit interviews
 - Manage clearance tasks
 - Review audit records
+- View exit status and progress dashboard
 
 ## Screenshots
-Screenshots will be added after the main frontend screens are completed.
+Screenshots of the main application screens can be added here.
 
 ## Getting Started
 ### Prerequisites
@@ -82,7 +84,7 @@ pytest
 ```
 
 ## Deployment
-Deployment will be completed during the later deployment phase. The planned platforms are listed in `docs/technology-stack.md`.
+The application is deployed with the React frontend hosted on Vercel, the FastAPI backend hosted on Render, and MySQL hosted on Aiven.
 
 ## Folder Structure
 ```text
