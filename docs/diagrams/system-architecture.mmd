@@ -1,5 +1,8 @@
 flowchart LR
-    Client[React.js Frontend] --> API[FastAPI REST API]
-    API --> DB[MySQL 8]
-    API --> Auth[JWT Authentication]
-    API --> Workflow[Exit Workflow Services]
+    F[React.js Frontend] --> A[FastAPI REST API]
+    A --> D[MySQL 8]
+    A --> J[JWT Authentication]
+    A --> E[Exit Workflow Services]
+    A --> H[HR Exit Status Dashboard]
+    H --> D
+    H --> E
