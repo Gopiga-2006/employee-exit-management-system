@@ -5,6 +5,7 @@ Employee Exit Management System is a full-stack application for submitting, revi
 ## Live Demo
 - Frontend: https://employee-exit-management-system.vercel.app
 - Backend: https://employee-exit-management-system-ez72.onrender.com
+- API Documentation: https://employee-exit-management-system-ez72.onrender.com/docs
 
 ## Overview
 The system gives employees a structured way to submit exit requests and view their progress. HR users can review requests, manage approvals, record exit interviews, track clearance activities, and view consolidated exit progress. The application uses a React frontend, FastAPI backend, and MySQL database.
@@ -12,7 +13,11 @@ The system gives employees a structured way to submit exit requests and view the
 ## Architecture Diagram
 ![System Architecture](docs/diagrams/system-architecture.svg)
 
-Detailed diagrams are available in `docs/diagrams/`, including the architecture, entity relationship, class, and module diagrams.
+Design artifacts:
+- [System Architecture](docs/diagrams/system-architecture.md)
+- [ER Diagram](docs/diagrams/er-diagram.md)
+- [Class Diagram](docs/diagrams/class-diagram.md)
+- [Module Diagram](docs/diagrams/module-diagram.md)
 
 ## Tech Stack
 | Layer | Technology |
@@ -40,13 +45,19 @@ Detailed diagrams are available in `docs/diagrams/`, including the architecture,
 - View exit status and progress dashboard
 
 ## Screenshots
-Screenshots of the main application screens are available from the deployed application.
+Screenshots of the key application screens can be added from the deployed application.
 
 ## Getting Started
 ### Prerequisites
 - Python 3.10 or later
 - Node.js 18 or later
 - MySQL 8
+
+### Clone and install
+```text
+git clone https://github.com/Gopiga-2006/employee-exit-management-system.git
+cd employee-exit-management-system
+```
 
 ### Backend
 ```text
@@ -73,6 +84,9 @@ Copy `.env.example` to `.env` and provide the local database and application set
 | JWT_EXPIRE_MINUTES | Token lifetime in minutes | Yes |
 
 ## API Documentation
+The deployed FastAPI Swagger documentation is available at:
+https://employee-exit-management-system-ez72.onrender.com/docs
+
 When the backend is running locally, Swagger is available at `/docs`.
 
 ## Running Tests
@@ -81,7 +95,7 @@ pytest
 ```
 
 ## Deployment
-The application is deployed with the React frontend hosted on Vercel, the FastAPI backend hosted on Render, and MySQL hosted on Aiven.
+The application is deployed with the React frontend hosted on Vercel, the FastAPI backend hosted on Render, and MySQL hosted on Aiven. GitHub Actions runs the backend quality checks and triggers the backend deployment after successful checks on the main branch.
 
 ## Folder Structure
 ```text
