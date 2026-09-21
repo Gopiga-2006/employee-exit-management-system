@@ -10,7 +10,7 @@ Provide HR users with one dashboard for reviewing employee exit progress without
 
 ## User Access
 
-The dashboard will be available to users with the `hr` or `admin` role. Employee users will continue to use the existing employee dashboard.
+The dashboard will be available to users with the `hr` role. Employee users will continue to use the existing employee dashboard. Administrator users manage accounts through the administrator interface and do not access HR workflow functions.
 
 ## Dashboard Sections
 
@@ -55,7 +55,7 @@ Expose a protected endpoint under `/api/dashboard` for HR users. The response wi
 }
 ```
 
-The endpoint will use the existing JWT authentication and role restrictions.
+The endpoint will use the existing JWT authentication and role restrictions, allowing only HR users.
 
 ## Frontend Design
 
