@@ -7,6 +7,7 @@ from app.api.dependencies import require_roles
 from app.core.database import get_db
 from app.models.entities import ExitApproval, ExitRequest, User
 from app.schemas.schemas import ApprovalCreate, ApprovalResponse, ApprovalUpdate
+from app.services.activity_service import create_approval, update_approval
 
 router = APIRouter(prefix="/api/approvals", tags=["Exit Approvals"])
 
@@ -24,16 +25,9 @@ def create_approval(
         raise HTTPException(status_code=404, detail="Exit request not found")
     if payload.decision not in {"Approved", "Rejected"}:
         raise HTTPException(status_code=400, detail="Decision must be Approved or Rejected")
-    approval = ExitApproval(
-        request_id=request_id,
-        approver_id=user.id,
-        decision=payload.decision,
-        remarks=payload.remarks,
+    approval = create_approval(
+        db, request_id, user.id, payload.decision, payload.remarks
     )
-    request.status = payload.decision
-    db.add(approval)
-    db.commit()
-    db.refresh(approval)
     data = ApprovalResponse.model_validate(approval).model_dump()
     return {"success": True, "data": data, "message": "Exit request processed"}
 
@@ -70,12 +64,8 @@ def update_approval(
         raise HTTPException(status_code=404, detail="Approval not found")
     if payload.decision not in {"Approved", "Rejected"}:
         raise HTTPException(status_code=400, detail="Decision must be Approved or Rejected")
-    approval.decision = payload.decision
-    approval.remarks = payload.remarks
-    request = db.get(ExitRequest, approval.request_id)
-    if request:
-        request.status = payload.decision
-    db.commit()
-    db.refresh(approval)
+    approval = update_approval(
+        db, approval, payload.decision, payload.remarks, user.id
+    )
     data = ApprovalResponse.model_validate(approval).model_dump()
     return {"success": True, "data": data, "message": "Approval updated"}
