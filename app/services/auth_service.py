@@ -57,6 +57,68 @@ def request_signup_otp(
     db.commit()
     send_otp_email(email, otp)
 
+def request_password_reset_otp(db: Session, email: str, new_password: str) -> None:
+    """Create a time-limited password reset OTP for an existing user."""
+    user = db.scalar(select(User).where(User.email == email))
+    if not user:
+        return
+    db.query(OtpVerification).filter(OtpVerification.email == email).delete(
+        synchronize_session=False
+    )
+    otp = f"{secrets.randbelow(10**OTP_LENGTH):0{OTP_LENGTH}d}"
+    pending = OtpVerification(
+        name=user.name,
+        email=email,
+        password_hash=hash_password(new_password),
+        role="password_reset",
+        otp_hash=hash_password(otp),
+        expires_at=datetime.now(UTC).replace(tzinfo=None)
+        + timedelta(minutes=OTP_EXPIRE_MINUTES),
+    )
+    db.add(pending)
+    db.commit()
+    send_otp_email(
+        email,
+        otp,
+        "Employee Exit Management System - Password Reset OTP",
+    )
+
+
+def verify_password_reset_otp(db: Session, email: str, otp: str) -> bool:
+    """Verify a password reset OTP and update the user's password."""
+    pending = db.scalar(
+        select(OtpVerification)
+        .where(
+            OtpVerification.email == email,
+            OtpVerification.role == "password_reset",
+        )
+        .order_by(OtpVerification.id.desc())
+    )
+    if not pending:
+        return False
+
+    now = datetime.now(UTC).replace(tzinfo=None)
+    if pending.expires_at < now or pending.attempts >= MAX_OTP_ATTEMPTS:
+        db.delete(pending)
+        db.commit()
+        return False
+
+    pending.attempts += 1
+    if not verify_password(otp, pending.otp_hash):
+        db.commit()
+        return False
+
+    user = db.scalar(select(User).where(User.email == email))
+    if not user:
+        db.delete(pending)
+        db.commit()
+        return False
+    user.password_hash = pending.password_hash
+    db.delete(pending)
+    db.commit()
+    return True
+
+
 
 def verify_signup_otp(db: Session, email: str, otp: str) -> User | None:
     """Verify a registration OTP and create the pending user."""
@@ -65,7 +127,7 @@ def verify_signup_otp(db: Session, email: str, otp: str) -> User | None:
         .where(OtpVerification.email == email)
         .order_by(OtpVerification.id.desc())
     )
-    if not pending:
+    if not pending or pending.role != "employee":
         return None
 
     now = datetime.now(UTC).replace(tzinfo=None)
