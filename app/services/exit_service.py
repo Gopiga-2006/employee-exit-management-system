@@ -6,12 +6,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.entities import ExitRequest
+from app.services.audit_service import record_audit
 
 
 def create_exit_request(db: Session, employee_id: int, reason: str, last_working_day: date) -> ExitRequest:
     """Create a pending exit request for an employee."""
     request = ExitRequest(employee_id=employee_id, reason=reason, last_working_day=last_working_day)
     db.add(request)
+    record_audit(db, employee_id, "Exit request submitted", "exit_requests")
     db.commit()
     db.refresh(request)
     return request
