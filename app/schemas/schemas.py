@@ -2,6 +2,8 @@
 
 from datetime import date
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from app.core.security import validate_password
@@ -13,6 +15,20 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
     role: str = "employee"
+
+    @field_validator("password")
+    @classmethod
+    def validate_password_policy(cls, value: str) -> str:
+        """Enforce the application password security policy."""
+        return validate_password(value)
+
+
+class AdminUserCreate(BaseModel):
+    """Request body for administrator-managed user creation."""
+    name: str
+    email: EmailStr
+    password: str = Field(min_length=8)
+    role: Literal["employee", "hr", "admin"]
 
     @field_validator("password")
     @classmethod
