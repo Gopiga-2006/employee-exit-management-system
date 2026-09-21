@@ -17,6 +17,10 @@ EMAIL_PROVIDER = os.getenv(
     "EMAIL_PROVIDER",
     "resend" if ENVIRONMENT.lower() == "production" else "console",
 )
+GMAIL_CLIENT_ID = os.getenv("GMAIL_CLIENT_ID", "")
+GMAIL_CLIENT_SECRET = os.getenv("GMAIL_CLIENT_SECRET", "")
+GMAIL_REFRESH_TOKEN = os.getenv("GMAIL_REFRESH_TOKEN", "")
+GMAIL_FROM = os.getenv("GMAIL_FROM", "")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 RESEND_FROM = os.getenv("RESEND_FROM", "onboarding@resend.dev")
 SMTP_HOST = os.getenv("SMTP_HOST", "")
