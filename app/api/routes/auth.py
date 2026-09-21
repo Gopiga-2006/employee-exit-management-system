@@ -5,10 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user
 from app.core.database import get_db
+from sqlalchemy import select
 from app.core.security import create_access_token
 from app.models.entities import User
 from app.schemas.schemas import (
     OtpVerify,
+    PasswordResetRequest,
+    PasswordResetVerify,
     TokenResponse,
     UserCreate,
     UserLogin,
@@ -16,7 +19,9 @@ from app.schemas.schemas import (
 )
 from app.services.auth_service import (
     authenticate_user,
+    request_password_reset_otp,
     request_signup_otp,
+    verify_password_reset_otp,
     verify_signup_otp,
 )
 
@@ -67,6 +72,39 @@ def signup(payload: UserCreate, db: Session = Depends(get_db)) -> dict:
         "success": True,
         "data": {"email": payload.email},
         "message": "OTP sent. Use the OTP verification endpoint to complete registration.",
+    }
+
+
+@router.post("/forgot-password/request-otp")
+def forgot_password_request_otp(
+    payload: PasswordResetRequest,
+    db: Session = Depends(get_db),
+) -> dict:
+    """Send a password reset OTP without revealing account existence."""
+    request_password_reset_otp(db, payload.email, "")
+    return {
+        "success": True,
+        "data": {"email": payload.email},
+        "message": "If the account exists, a password reset OTP has been sent.",
+    }
+
+
+@router.post("/forgot-password/verify-otp")
+def forgot_password_verify_otp(
+    payload: PasswordResetVerify,
+    db: Session = Depends(get_db),
+) -> dict:
+    """Verify a password reset OTP and update the account password."""
+    user = db.scalar(select(User).where(User.email == payload.email))
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+    request_password_reset_otp(db, payload.email, payload.new_password)
+    if not verify_password_reset_otp(db, payload.email, payload.otp):
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+    return {
+        "success": True,
+        "data": {"email": payload.email},
+        "message": "Password reset successful. You can sign in with your new password.",
     }
 
 
