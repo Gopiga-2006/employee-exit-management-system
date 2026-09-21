@@ -42,6 +42,17 @@ classDiagram
         +string entity
         +datetime created_at
     }
+    class OtpVerification {
+        +int id
+        +string name
+        +string email
+        +string password_hash
+        +string role
+        +string otp_hash
+        +datetime expires_at
+        +int attempts
+        +datetime created_at
+    }
     User "1" --> "many" ExitRequest : submits
     User "1" --> "many" ExitApproval : approves
     ExitRequest "1" --> "many" ExitApproval : has
