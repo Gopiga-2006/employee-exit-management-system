@@ -81,7 +81,11 @@ Copy `.env.example` to `.env` and provide the local database and application set
 ## Environment Variables
 | Name | Description | Required |
 | --- | --- | --- |
-| DATABASE_URL | MySQL connection string | Yes |
+| DB_HOST | MySQL database host | Yes |
+| DB_PORT | MySQL database port | Yes |
+| DB_USER | MySQL database username | Yes |
+| DB_PASSWORD | MySQL database password | Yes |
+| DB_NAME | MySQL database name | Yes |
 | JWT_SECRET | Secret used to sign login tokens | Yes |
 | JWT_EXPIRE_MINUTES | Token lifetime in minutes | Yes |
 | EMAIL_PROVIDER | OTP delivery mode: `console`, `gmail`, `resend`, or `smtp` | Production |
