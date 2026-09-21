@@ -16,7 +16,6 @@ from app.schemas.schemas import (
 )
 from app.services.auth_service import (
     authenticate_user,
-    create_user,
     request_signup_otp,
     verify_signup_otp,
 )
@@ -63,7 +62,7 @@ def signup(payload: UserCreate, db: Session = Depends(get_db)) -> dict:
     existing = db.query(User).filter(User.email == payload.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
-    request_signup_otp(db, payload.name, payload.email, payload.password, payload.role)
+    request_signup_otp(db, payload.name, payload.email, payload.password, "employee")
     return {
         "success": True,
         "data": {"email": payload.email},
