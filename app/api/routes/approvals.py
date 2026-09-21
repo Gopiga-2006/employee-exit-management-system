@@ -17,7 +17,7 @@ def create_approval(
     request_id: int,
     payload: ApprovalCreate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """Record an HR decision for an exit request."""
     request = db.get(ExitRequest, request_id)
@@ -36,7 +36,7 @@ def create_approval(
 def list_approvals(
     request_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """List approval decisions recorded for an exit request."""
     if not db.get(ExitRequest, request_id):
@@ -56,7 +56,7 @@ def update_approval(
     approval_id: int,
     payload: ApprovalUpdate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """Update an existing approval decision."""
     approval = db.get(ExitApproval, approval_id)
