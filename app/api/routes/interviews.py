@@ -11,6 +11,7 @@ from app.schemas.activity_schemas import (
     InterviewResponse,
     InterviewUpdate,
 )
+from app.services.activity_service import create_interview, update_interview
 
 router = APIRouter(prefix="/api/interviews", tags=["Exit Interviews"])
 
@@ -28,14 +29,9 @@ def create_interview(
         raise HTTPException(status_code=404, detail="Exit request not found")
     if request.interview:
         raise HTTPException(status_code=400, detail="Interview already recorded")
-    interview = ExitInterview(
-        request_id=request_id,
-        interview_date=payload.interview_date,
-        feedback=payload.feedback,
+    interview = create_interview(
+        db, request_id, payload.interview_date, payload.feedback, user.id
     )
-    db.add(interview)
-    db.commit()
-    db.refresh(interview)
     data = InterviewResponse.model_validate(interview).model_dump()
     return {"success": True, "data": data, "message": "Exit interview recorded"}
 
@@ -65,9 +61,8 @@ def update_interview(
     interview = db.query(ExitInterview).filter(ExitInterview.request_id == request_id).first()
     if not interview:
         raise HTTPException(status_code=404, detail="Exit interview not found")
-    interview.interview_date = payload.interview_date
-    interview.feedback = payload.feedback
-    db.commit()
-    db.refresh(interview)
+    interview = update_interview(
+        db, interview, payload.interview_date, payload.feedback, user.id
+    )
     data = InterviewResponse.model_validate(interview).model_dump()
     return {"success": True, "data": data, "message": "Exit interview updated"}
