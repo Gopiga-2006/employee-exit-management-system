@@ -1,1 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="850" viewBox="0 0 1400 850"><rect width="1400" height="850" fill="white"/><text x="40" y="55" font-family="Arial" font-size="32" font-weight="bold">Entity Relationship Diagram</text><g fill="white" stroke="black" stroke-width="2"><rect x="60" y="120" width="300" height="110"/><rect x="500" y="120" width="320" height="130"/><rect x="980" y="120" width="320" height="130"/><rect x="500" y="430" width="320" height="110"/><rect x="980" y="430" width="320" height="120"/><rect x="60" y="430" width="300" height="110"/></g><g font-family="Arial" font-size="18"><text x="80" y="150">USERS</text><text x="80" y="180">id, name, email, role</text><text x="520" y="150">EXIT_REQUESTS</text><text x="520" y="180">id, employee_id, reason</text><text x="520" y="210">last_working_day, status</text><text x="1000" y="150">EXIT_APPROVALS</text><text x="1000" y="180">id, request_id, approver_id</text><text x="1000" y="210">decision, remarks</text><text x="520" y="460">EXIT_INTERVIEWS</text><text x="520" y="490">id, request_id, feedback</text><text x="1000" y="460">CLEARANCE_TASKS</text><text x="1000" y="490">id, request_id, assigned_to</text><text x="1000" y="520">status</text><text x="80" y="460">AUDIT_LOGS</text><text x="80" y="490">id, user_id, action, entity</text></g><g stroke="black" stroke-width="3" fill="black"><line x1="360" y1="175" x2="500" y2="175"/><polygon points="500,175 485,167 485,183"/><line x1="360" y1="200" x2="980" y2="200"/><polygon points="980,200 965,192 965,208"/><line x1="820" y1="185" x2="980" y2="185"/><polygon points="980,185 965,177 965,193"/><line x1="660" y1="250" x2="660" y2="430"/><polygon points="660,430 652,415 668,415"/><line x1="820" y1="230" x2="980" y2="470"/><polygon points="980,470 963,465 974,454"/><line x1="360" y1="485" x2="980" y2="485"/><polygon points="980,485 965,477 965,493"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+<rect width="1600" height="1000" fill="white"/>
+<text x="40" y="55" font-family="Arial" font-size="32" font-weight="bold">Entity Relationship Diagram</text>
+<g fill="white" stroke="black" stroke-width="2">
+<rect x="50" y="120" width="300" height="170"/><rect x="500" y="120" width="330" height="180"/>
+<rect x="1000" y="120" width="330" height="180"/><rect x="500" y="480" width="330" height="150"/>
+<rect x="1000" y="480" width="330" height="170"/><rect x="50" y="480" width="300" height="150"/>
+<rect x="1250" y="760" width="300" height="190"/>
+</g>
+<g font-family="Arial" font-size="18">
+<text x="70" y="150">USERS</text><text x="70" y="180">id, name, email, role</text><text x="70" y="210">password_hash</text>
+<text x="520" y="150">EXIT_REQUESTS</text><text x="520" y="180">id, employee_id</text><text x="520" y="210">reason, last_working_day</text><text x="520" y="240">status</text>
+<text x="1020" y="150">EXIT_APPROVALS</text><text x="1020" y="180">id, request_id</text><text x="1020" y="210">approver_id, decision</text><text x="1020" y="240">remarks</text>
+<text x="520" y="510">EXIT_INTERVIEWS</text><text x="520" y="540">id, request_id</text><text x="520" y="570">interview_date, feedback</text>
+<text x="1020" y="510">CLEARANCE_TASKS</text><text x="1020" y="540">id, request_id</text><text x="1020" y="570">assigned_to, task</text><text x="1020" y="600">status</text>
+<text x="70" y="510">AUDIT_LOGS</text><text x="70" y="540">id, user_id</text><text x="70" y="570">action, entity, created_at</text>
+<text x="1270" y="790">OTP_VERIFICATIONS</text><text x="1270" y="820">id, name, email</text><text x="1270" y="850">password_hash, role</text><text x="1270" y="880">otp_hash, expires_at</text><text x="1270" y="910">attempts, created_at</text>
+</g>
+<g stroke="black" stroke-width="3" fill="black">
+<line x1="350" y1="190" x2="500" y2="190"/><polygon points="500,190 485,182 485,198"/>
+<line x1="350" y1="220" x2="1000" y2="220"/><polygon points="1000,220 985,212 985,228"/>
+<line x1="830" y1="190" x2="1000" y2="190"/><polygon points="1000,190 985,182 985,198"/>
+<line x1="665" y1="300" x2="665" y2="480"/><polygon points="665,480 657,465 673,465"/>
+<line x1="830" y1="245" x2="1000" y2="520"/><polygon points="1000,520 984,514 996,503"/>
+<line x1="350" y1="550" x2="1000" y2="550"/><polygon points="1000,550 985,542 985,558"/>
+<line x1="1150" y1="300" x2="1380" y2="760"/><polygon points="1380,760 1364,752 1378,745"/>
+</g>
+</svg>
