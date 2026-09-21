@@ -17,3 +17,9 @@
 - Added status aggregation, pending actions, recent exit requests, and exit progress views.
 - Added automated dashboard service coverage and protected dashboard access.
 - Integrated the enhancement into the live application.
+
+
+## Security Enhancement
+- Added strong password validation requiring at least 8 characters, uppercase, lowercase, number, and special character.
+- Added registration OTP verification with expiry and attempt limits.
+- Added configurable SMTP OTP delivery with console delivery available for local development.

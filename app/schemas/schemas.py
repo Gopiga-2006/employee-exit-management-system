@@ -2,21 +2,35 @@
 
 from datetime import date
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
+from app.core.security import validate_password
 
 
 class UserCreate(BaseModel):
     """Request body for user registration."""
     name: str
     email: EmailStr
-    password: str
+    password: str = Field(min_length=8)
     role: str = "employee"
+
+    @field_validator("password")
+    @classmethod
+    def validate_password_policy(cls, value: str) -> str:
+        """Enforce the application password security policy."""
+        return validate_password(value)
 
 
 class UserLogin(BaseModel):
     """Request body for user login."""
     email: EmailStr
     password: str
+
+
+class OtpVerify(BaseModel):
+    """Request body for registration OTP verification."""
+    email: EmailStr
+    otp: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
 
 
 class UserResponse(BaseModel):

@@ -36,40 +36,72 @@ function Login({ onLogin }) {
 
 function Signup({ onSignup }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "employee" });
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function submit(event) {
+  async function requestOtp(event) {
     event.preventDefault();
     setMessage("");
     setError("");
     setLoading(true);
     try {
-      await api.post("/api/auth/signup", form);
+      await api.post("/api/auth/signup/request-otp", form);
+      setOtpSent(true);
+      setMessage("OTP sent. Enter the 6-digit OTP to complete registration.");
+    } catch (err) {
+      setError(getErrorMessage(err, "OTP could not be sent"));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function verifyOtp(event) {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+    setLoading(true);
+    try {
+      await api.post("/api/auth/signup/verify-otp", { email: form.email, otp });
       setMessage("Account created. You can sign in now.");
       onSignup();
     } catch (err) {
-      setError(getErrorMessage(err, "Account could not be created"));
+      setError(getErrorMessage(err, "OTP verification failed"));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form className="card p-4 mx-auto auth-card" onSubmit={submit}>
+    <form className="card p-4 mx-auto auth-card" onSubmit={otpSent ? verifyOtp : requestOtp}>
       <h2>Register</h2>
-      <input className="form-control mb-3" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-      <input className="form-control mb-3" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-      <input className="form-control mb-3" type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-      <select className="form-select mb-3" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-        <option value="employee">Employee</option>
-        <option value="hr">HR Executive</option>
-        <option value="admin">HR Administrator</option>
-      </select>
-      <button className="btn btn-outline-primary" type="submit" disabled={loading}>
-        {loading ? "Creating..." : "Create Account"}
-      </button>
+      {!otpSent ? (
+        <>
+          <input className="form-control mb-3" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <input className="form-control mb-3" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          <input className="form-control mb-2" type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={8} />
+          <div className="small text-secondary mb-3">Password: minimum 8 characters, with uppercase, lowercase, number, and special character.</div>
+          <select className="form-select mb-3" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+            <option value="employee">Employee</option>
+            <option value="hr">HR Executive</option>
+            <option value="admin">HR Administrator</option>
+          </select>
+          <button className="btn btn-outline-primary" type="submit" disabled={loading}>
+            {loading ? "Sending OTP..." : "Send OTP"}
+          </button>
+        </>
+      ) : (
+        <>
+          <div className="alert alert-info">A 6-digit OTP was sent for {form.email}.</div>
+          <input className="form-control mb-3" inputMode="numeric" maxLength={6} placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} required />
+          <button className="btn btn-primary" type="submit" disabled={loading || otp.length !== 6}>
+            {loading ? "Verifying..." : "Verify OTP & Create Account"}
+          </button>
+          <button type="button" className="btn btn-link mt-2" onClick={() => { setOtpSent(false); setOtp(""); }}>Change registration details</button>
+        </>
+      )}
       {message && <div className="alert alert-success mt-3 mb-0">{message}</div>}
       {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
     </form>

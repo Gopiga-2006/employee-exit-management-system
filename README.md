@@ -24,7 +24,7 @@ Design artifacts:
 | --- | --- |
 | Frontend | React.js, JavaScript, Bootstrap, Axios |
 | Backend | Python, FastAPI |
-| Authentication | JWT, bcrypt |
+| Authentication | JWT, bcrypt, OTP verification |
 | Data Access | SQLAlchemy |
 | Database | MySQL 8 |
 | Testing | Pytest |
@@ -32,7 +32,8 @@ Design artifacts:
 
 ## Features
 ### Employee
-- Register and sign in
+- Register with OTP verification and strong password validation
+- Sign in
 - Submit an exit request
 - View own exit requests and statuses
 
@@ -82,6 +83,12 @@ Copy `.env.example` to `.env` and provide the local database and application set
 | DATABASE_URL | MySQL connection string | Yes |
 | JWT_SECRET | Secret used to sign login tokens | Yes |
 | JWT_EXPIRE_MINUTES | Token lifetime in minutes | Yes |
+| SMTP_HOST | SMTP server for OTP delivery | Production |
+| SMTP_PORT | SMTP server port | Production |
+| SMTP_USERNAME | SMTP account username | Production |
+| SMTP_PASSWORD | SMTP account password or app password | Production |
+| SMTP_FROM | Sender address for OTP email | Production |
+| OTP_DELIVERY | OTP delivery mode (`console` for local testing, `smtp` for email) | No |
 
 ## API Documentation
 The deployed FastAPI Swagger documentation is available at:
