@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.approvals import router as approvals_router
 from app.api.routes.auth import router as auth_router
+from app.api.routes.admin import router as admin_router
 from app.api.routes.clearance import router as clearance_router
 from app.api.routes.dashboard import router as dashboard_router
 from app.api.routes.exit_requests import router as exit_requests_router
@@ -27,6 +28,7 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
+app.include_router(admin_router)
 app.include_router(exit_requests_router)
 app.include_router(approvals_router)
 app.include_router(interviews_router)
