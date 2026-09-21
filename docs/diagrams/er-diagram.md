@@ -9,7 +9,6 @@ erDiagram
     USERS ||--o{ CLEARANCE_TASKS : assigned
     EXIT_REQUESTS ||--o{ CLEARANCE_TASKS : has
     USERS ||--o{ AUDIT_LOGS : creates
-    USERS ||--o{ OTP_VERIFICATIONS : owns
 
     USERS {
         int id PK
