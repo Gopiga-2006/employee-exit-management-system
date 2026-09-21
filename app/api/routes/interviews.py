@@ -21,7 +21,7 @@ def create_interview(
     request_id: int,
     payload: InterviewCreate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """Record an exit interview for a request."""
     request = db.get(ExitRequest, request_id)
@@ -40,7 +40,7 @@ def create_interview(
 def get_interview(
     request_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """Return the interview recorded for an exit request."""
     interview = db.query(ExitInterview).filter(ExitInterview.request_id == request_id).first()
@@ -55,7 +55,7 @@ def update_interview(
     request_id: int,
     payload: InterviewUpdate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """Update the interview recorded for an exit request."""
     interview = db.query(ExitInterview).filter(ExitInterview.request_id == request_id).first()
