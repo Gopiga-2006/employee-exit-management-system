@@ -138,6 +138,48 @@ function EmployeeDashboard() {
   );
 }
 
+function AdminDashboard() {
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "hr" });
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function createUser(event) {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+    try {
+      const response = await api.post("/api/admin/users", form);
+      setMessage(response.data.message);
+      setForm({ name: "", email: "", password: "", role: "hr" });
+    } catch (err) {
+      setError(getErrorMessage(err, "User could not be created"));
+    }
+  }
+
+  return (
+    <section>
+      <div className="card p-4 mx-auto" style={{ maxWidth: "650px" }}>
+        <h2>Administration</h2>
+        <p className="text-secondary">Create managed employee, HR or administrator accounts.</p>
+        <form onSubmit={createUser}>
+          <input className="form-control mb-3" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <input className="form-control mb-3" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          <input className="form-control mb-2" type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={8} />
+          <div className="small text-secondary mb-3">Password: minimum 8 characters, with uppercase, lowercase, number, and special character.</div>
+          <select className="form-select mb-3" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+            <option value="hr">HR</option>
+            <option value="employee">Employee</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button className="btn btn-primary" type="submit">Create Account</button>
+        </form>
+        {message && <div className="alert alert-success mt-3 mb-0">{message}</div>}
+        {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
+      </div>
+    </section>
+  );
+}
+
 function HrDashboard({ user }) {
   const [requests, setRequests] = useState([]);
   const [dashboard, setDashboard] = useState(null);
@@ -404,5 +446,5 @@ export default function App() {
     return <main className="container py-5"><h1 className="text-center mb-4">Employee Exit Management System</h1>{mode === "login" ? <Login onLogin={setUser} /> : <Signup onSignup={() => setMode("login")} />}<div className="text-center mt-3"><button className="btn btn-link" onClick={() => setMode(mode === "login" ? "signup" : "login")}>{mode === "login" ? "Create an account" : "Back to sign in"}</button></div></main>;
   }
 
-  return <main className="container py-5"><div className="d-flex justify-content-between align-items-center mb-4"><div><h1>Employee Exit Management System</h1><div className="text-secondary">Signed in as {user.name} ({user.role})</div></div><button className="btn btn-outline-secondary" onClick={() => { localStorage.removeItem("access_token"); setUser(null); }}>Sign Out</button></div>{user.role === "employee" ? <EmployeeDashboard /> : <HrDashboard user={user} />}</main>;
+  return <main className="container py-5"><div className="d-flex justify-content-between align-items-center mb-4"><div><h1>Employee Exit Management System</h1><div className="text-secondary">Signed in as {user.name} ({user.role})</div></div><button className="btn btn-outline-secondary" onClick={() => { localStorage.removeItem("access_token"); setUser(null); }}>Sign Out</button></div>{user.role === "employee" ? <EmployeeDashboard /> : user.role === "admin" ? <AdminDashboard /> : <HrDashboard user={user} />}</main>;
 }
