@@ -3,6 +3,10 @@ __pycache__/
 .venv/
 venv/
 .env
+credentials.json
+client_secret_*.json
+token.json
+generate_gmail_token.py
 node_modules/
 dist/
 build/
