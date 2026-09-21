@@ -15,7 +15,7 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 SMTP_FROM = os.getenv("SMTP_FROM", SMTP_USERNAME)
-OTP_DELIVERY = os.getenv("OTP_DELIVERY", "console")
+OTP_DELIVERY = os.getenv("OTP_DELIVERY", "smtp" if ENVIRONMENT.lower() == "production" else "console")
 JWT_ALGORITHM = "HS256"
 
 if ENVIRONMENT.lower() == "production" and JWT_SECRET == "change_this_local_secret":
