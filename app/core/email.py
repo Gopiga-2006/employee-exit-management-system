@@ -25,7 +25,7 @@ from app.core.config import (
 )
 
 
-def _send_with_gmail(recipient: str, otp: str) -> None:
+def _send_with_gmail(recipient: str, otp: str, subject: str) -> None:
     """Send an OTP through the Gmail API over HTTPS."""
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
@@ -58,7 +58,7 @@ def _send_with_gmail(recipient: str, otp: str) -> None:
     )
     message["to"] = recipient
     message["from"] = GMAIL_FROM
-    message["subject"] = "Employee Exit Management System - Verification OTP"
+    message["subject"] = subject
 
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
     service = build("gmail", "v1", credentials=credentials, cache_discovery=False)
@@ -68,13 +68,13 @@ def _send_with_gmail(recipient: str, otp: str) -> None:
     ).execute()
 
 
-def _send_with_resend(recipient: str, otp: str) -> None:
+def _send_with_resend(recipient: str, otp: str, subject: str) -> None:
     """Send an OTP through the Resend HTTPS email API."""
     payload = json.dumps(
         {
             "from": RESEND_FROM,
             "to": [recipient],
-            "subject": "Employee Exit Management System - Verification OTP",
+            "subject": subject,
             "text": f"Your verification OTP is {otp}. It expires in 10 minutes.",
         }
     ).encode("utf-8")
@@ -97,10 +97,10 @@ def _send_with_resend(recipient: str, otp: str) -> None:
         raise RuntimeError("Unable to reach the email delivery service") from exc
 
 
-def _send_with_smtp(recipient: str, otp: str) -> None:
+def _send_with_smtp(recipient: str, otp: str, subject: str) -> None:
     """Send an OTP through an SMTP server."""
     message = EmailMessage()
-    message["Subject"] = "Employee Exit Management System - Verification OTP"
+    message["Subject"] = subject
     message["From"] = SMTP_FROM
     message["To"] = recipient
     message.set_content(
@@ -113,16 +113,16 @@ def _send_with_smtp(recipient: str, otp: str) -> None:
         server.send_message(message)
 
 
-def send_otp_email(recipient: str, otp: str) -> None:
-    """Deliver a registration OTP using the configured email provider."""
+def send_otp_email(recipient: str, otp: str, subject: str) -> None:
+    """Deliver an OTP using the configured email provider."""
     provider = EMAIL_PROVIDER.lower()
 
     if provider == "console":
-        print(f"Registration OTP for {recipient}: {otp}")
+        print(f"OTP for {recipient}: {otp}")
         return
 
     if provider == "gmail":
-        _send_with_gmail(recipient, otp)
+        _send_with_gmail(recipient, otp, subject)
         return
 
     if provider == "resend":
@@ -133,7 +133,7 @@ def send_otp_email(recipient: str, otp: str) -> None:
                 )
             print(f"Registration OTP for {recipient}: {otp}")
             return
-        _send_with_resend(recipient, otp)
+        _send_with_resend(recipient, otp, subject)
         return
 
     if provider == "smtp":
@@ -142,7 +142,7 @@ def send_otp_email(recipient: str, otp: str) -> None:
                 raise RuntimeError("SMTP settings must be configured for OTP delivery")
             print(f"Registration OTP for {recipient}: {otp}")
             return
-        _send_with_smtp(recipient, otp)
+        _send_with_smtp(recipient, otp, subject)
         return
 
     raise RuntimeError("Unsupported OTP email provider")
