@@ -39,3 +39,14 @@ Table audit_logs {
   entity varchar
   created_at datetime
 }
+Table otp_verifications {
+  id int [pk]
+  name varchar
+  email varchar
+  password_hash varchar
+  role varchar
+  otp_hash varchar
+  expires_at datetime
+  attempts int
+  created_at datetime
+}
