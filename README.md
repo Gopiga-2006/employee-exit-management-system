@@ -84,7 +84,11 @@ Copy `.env.example` to `.env` and provide the local database and application set
 | JWT_SECRET | Secret used to sign login tokens | Yes |
 | JWT_EXPIRE_MINUTES | Token lifetime in minutes | Yes |
 | EMAIL_PROVIDER | OTP delivery mode: `console`, `gmail`, `resend`, or `smtp` | Production |
-| GMAIL_CLIENT_ID | Google OAuth client ID for Gmail API | Production when using Gmail |\n| GMAIL_CLIENT_SECRET | Google OAuth client secret for Gmail API | Production when using Gmail |\n| GMAIL_REFRESH_TOKEN | Google OAuth refresh token for Gmail API | Production when using Gmail |\n| GMAIL_FROM | Gmail sender address | Production when using Gmail |\n| RESEND_API_KEY | API key for Resend HTTPS email delivery | When using Resend |
+| GMAIL_CLIENT_ID | Google OAuth client ID for Gmail API | Production when using Gmail |
+| GMAIL_CLIENT_SECRET | Google OAuth client secret for Gmail API | Production when using Gmail |
+| GMAIL_REFRESH_TOKEN | Google OAuth refresh token for Gmail API | Production when using Gmail |
+| GMAIL_FROM | Gmail sender address | Production when using Gmail |
+| RESEND_API_KEY | API key for Resend HTTPS email delivery | When using Resend |
 | RESEND_FROM | Verified sender address for Resend | Production when using Resend |
 | SMTP_HOST | SMTP server for OTP delivery | When using SMTP |
 | SMTP_PORT | SMTP server port | When using SMTP |
