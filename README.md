@@ -46,6 +46,10 @@ Design artifacts:
 - Review audit records
 - View exit status and progress dashboard
 
+### Administrator
+- Create and manage Employee, HR, and Administrator accounts
+- Manage privileged account access through the protected administrator interface
+
 ## Screenshots
 Screenshots of the key application screens can be added from the deployed application.
 
