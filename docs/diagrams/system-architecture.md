@@ -13,4 +13,4 @@ flowchart LR
 - Backend/API layer: FastAPI REST endpoints under `/api/`.
 - Application layer: authentication and exit workflow services.
 - Database layer: MySQL 8 accessed through SQLAlchemy.
-- Planned hosting: frontend on Vercel or Netlify and backend on Render or Railway.
+- Deployment: frontend on Vercel, backend on Render, and MySQL database on Aiven.
