@@ -35,7 +35,7 @@ function Login({ onLogin }) {
 }
 
 function Signup({ onSignup }) {
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "employee" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [message, setMessage] = useState("");
@@ -83,11 +83,6 @@ function Signup({ onSignup }) {
           <input className="form-control mb-3" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
           <input className="form-control mb-2" type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={8} />
           <div className="small text-secondary mb-3">Password: minimum 8 characters, with uppercase, lowercase, number, and special character.</div>
-          <select className="form-select mb-3" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-            <option value="employee">Employee</option>
-            <option value="hr">HR Executive</option>
-            <option value="admin">HR Administrator</option>
-          </select>
           <button className="btn btn-outline-primary" type="submit" disabled={loading}>
             {loading ? "Sending OTP..." : "Send OTP"}
           </button>
