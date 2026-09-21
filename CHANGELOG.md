@@ -1,7 +1,7 @@
+# Changelog
+
 ## 2026-09-21
 - Added email OTP password reset for forgotten passwords with password-policy validation and time-limited verification.
-
-# Changelog
 
 ## 2026-09-21
 - Restricted public registration to employee accounts and kept privileged roles out of the signup flow.
