@@ -8,6 +8,8 @@
 - `POST /api/auth/signup/verify-otp` — verifies the OTP and creates the employee account.
 - `POST /api/auth/signup` — legacy-compatible endpoint that starts the same OTP registration flow.
 - `POST /api/auth/login`
+- `POST /api/auth/forgot-password/request-otp` — public password reset OTP request.
+- `POST /api/auth/forgot-password/verify-otp` — verifies the reset OTP and updates the password.
 - `GET /api/auth/me` — authenticated profile endpoint.
 
 ## Exit Requests
