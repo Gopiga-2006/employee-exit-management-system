@@ -11,6 +11,11 @@ from app.schemas.activity_schemas import (
     ClearanceTaskResponse,
     ClearanceTaskUpdate,
 )
+from app.services.activity_service import (
+    create_clearance_task,
+    delete_clearance_task,
+    update_clearance_task,
+)
 
 router = APIRouter(prefix="/api/clearance-tasks", tags=["Clearance Tasks"])
 
@@ -27,10 +32,9 @@ def create_task(
         raise HTTPException(status_code=404, detail="Exit request not found")
     if not db.get(User, payload.assigned_to):
         raise HTTPException(status_code=404, detail="Assigned user not found")
-    task = ClearanceTask(request_id=request_id, assigned_to=payload.assigned_to, task=payload.task)
-    db.add(task)
-    db.commit()
-    db.refresh(task)
+    task = create_clearance_task(
+        db, request_id, payload.assigned_to, payload.task, user.id
+    )
     data = ClearanceTaskResponse.model_validate(task).model_dump()
     return {"success": True, "data": data, "message": "Clearance task created"}
 
@@ -60,9 +64,7 @@ def update_task(
         raise HTTPException(status_code=404, detail="Clearance task not found")
     if payload.status not in {"Pending", "Completed"}:
         raise HTTPException(status_code=400, detail="Invalid clearance status")
-    task.status = payload.status
-    db.commit()
-    db.refresh(task)
+    task = update_clearance_task(db, task, payload.status, user.id)
     data = ClearanceTaskResponse.model_validate(task).model_dump()
     return {"success": True, "data": data, "message": "Clearance task updated"}
 
@@ -77,5 +79,4 @@ def delete_task(
     task = db.get(ClearanceTask, task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Clearance task not found")
-    db.delete(task)
-    db.commit()
+    delete_clearance_task(db, task, user.id)
