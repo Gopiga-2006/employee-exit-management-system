@@ -25,7 +25,7 @@ def create_task(
     request_id: int,
     payload: ClearanceTaskCreate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """Create a clearance task for an exit request."""
     if not db.get(ExitRequest, request_id):
@@ -43,7 +43,7 @@ def create_task(
 def list_tasks(
     request_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """List clearance tasks for an exit request."""
     tasks = db.query(ClearanceTask).filter(ClearanceTask.request_id == request_id).order_by(ClearanceTask.id).all()
@@ -56,7 +56,7 @@ def update_task(
     task_id: int,
     payload: ClearanceTaskUpdate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """Update the status of a clearance task."""
     task = db.get(ClearanceTask, task_id)
@@ -73,7 +73,7 @@ def update_task(
 def delete_task(
     task_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> None:
     """Delete a clearance task from an exit request."""
     task = db.get(ClearanceTask, task_id)
