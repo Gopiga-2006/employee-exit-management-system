@@ -1,7 +1,7 @@
 """Tests for authentication service functions."""
 
 from app.core.security import validate_password
-from app.services.auth_service import authenticate_user, create_user, verify_signup_otp
+from app.services.auth_service import authenticate_user, create_user
 
 
 def test_password_policy_accepts_strong_password():
