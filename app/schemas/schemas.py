@@ -65,13 +65,6 @@ class PasswordResetVerify(BaseModel):
     """Request body for completing a password reset."""
     email: EmailStr
     otp: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
-    new_password: str = Field(min_length=8)
-
-    @field_validator("new_password")
-    @classmethod
-    def validate_new_password_policy(cls, value: str) -> str:
-        """Enforce the application password security policy."""
-        return validate_password(value)
 
 
 class UserResponse(BaseModel):
