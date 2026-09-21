@@ -5,7 +5,7 @@ function getErrorMessage(err, fallback) {
   return err.response?.data?.detail || err.response?.data?.message || err.message || fallback;
 }
 
-function Login({ onLogin }) {
+function Login({ onLogin, onForgotPassword }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -29,6 +29,81 @@ function Login({ onLogin }) {
       <input className="form-control mb-3" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       <input className="form-control mb-3" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       <button className="btn btn-primary" type="submit">Sign In</button>
+      <button type="button" className="btn btn-link mt-2" onClick={onForgotPassword}>Forgot password?</button>
+      {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
+    </form>
+  );
+}
+
+function ForgotPassword({ onComplete }) {
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function requestOtp(event) {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+    setLoading(true);
+    try {
+      await api.post("/api/auth/forgot-password/request-otp", {
+        email,
+        new_password: newPassword,
+      });
+      setOtpSent(true);
+      setMessage("If the account exists, a password reset OTP has been sent.");
+    } catch (err) {
+      setError(getErrorMessage(err, "OTP could not be sent"));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function resetPassword(event) {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+    setLoading(true);
+    try {
+      await api.post("/api/auth/forgot-password/verify-otp", {
+        email,
+        otp,
+      });
+      setMessage("Password reset successful. You can sign in now.");
+      setTimeout(onComplete, 800);
+    } catch (err) {
+      setError(getErrorMessage(err, "Password reset failed"));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form className="card p-4 mx-auto auth-card" onSubmit={otpSent ? resetPassword : requestOtp}>
+      <h2>Forgot Password</h2>
+      {!otpSent ? (
+        <>
+          <input className="form-control mb-3" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input className="form-control mb-2" type="password" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} />
+          <div className="small text-secondary mb-3">Password: minimum 8 characters, with uppercase, lowercase, number, and special character.</div>
+          <button className="btn btn-primary" type="submit" disabled={loading}>
+            {loading ? "Sending OTP..." : "Send Reset OTP"}
+          </button>
+        </>
+      ) : (
+        <>
+          <div className="alert alert-info">Enter the 6-digit OTP sent to your email.</div>
+          <input className="form-control mb-3" inputMode="numeric" maxLength={6} placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} required />
+          <button className="btn btn-primary" type="submit" disabled={loading || otp.length !== 6}>
+            {loading ? "Resetting..." : "Verify OTP & Reset Password"}
+          </button>
+        </>
+      )}
+      {message && <div className="alert alert-success mt-3 mb-0">{message}</div>}
       {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
     </form>
   );
@@ -443,7 +518,7 @@ export default function App() {
   const [mode, setMode] = useState("login");
 
   if (!user) {
-    return <main className="container py-5"><h1 className="text-center mb-4">Employee Exit Management System</h1>{mode === "login" ? <Login onLogin={setUser} /> : <Signup onSignup={() => setMode("login")} />}<div className="text-center mt-3"><button className="btn btn-link" onClick={() => setMode(mode === "login" ? "signup" : "login")}>{mode === "login" ? "Create an account" : "Back to sign in"}</button></div></main>;
+    return <main className="container py-5"><h1 className="text-center mb-4">Employee Exit Management System</h1>{mode === "login" ? <Login onLogin={setUser} onForgotPassword={() => setMode("forgot")} /> : mode === "forgot" ? <ForgotPassword onComplete={() => setMode("login")} /> : <Signup onSignup={() => setMode("login")} />}<div className="text-center mt-3"><button className="btn btn-link" onClick={() => setMode(mode === "login" ? "signup" : "login")}>{mode === "login" ? "Create an account" : "Back to sign in"}</button></div></main>;
   }
 
   return <main className="container py-5"><div className="d-flex justify-content-between align-items-center mb-4"><div><h1>Employee Exit Management System</h1><div className="text-secondary">Signed in as {user.name} ({user.role})</div></div><button className="btn btn-outline-secondary" onClick={() => { localStorage.removeItem("access_token"); setUser(null); }}>Sign Out</button></div>{user.role === "employee" ? <EmployeeDashboard /> : user.role === "admin" ? <AdminDashboard /> : <HrDashboard user={user} />}</main>;
