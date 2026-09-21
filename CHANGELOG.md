@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-21
+- Restricted public registration to employee accounts and kept privileged roles out of the signup flow.
+- Added audit logging for exit requests, approvals, interviews, and clearance activities.
+- Added activity service coverage and tests for the major exit workflow modules.
+- Updated API and ER documentation for OTP registration and current endpoints.
+
 ## Week 1
 - Added the finalized problem statement, project setup, and domain plan.
 
