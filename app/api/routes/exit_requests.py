@@ -38,7 +38,7 @@ def get_my_requests(
 @router.get("/all")
 def get_all_requests(
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict:
     """List all exit requests for HR users."""
     requests = list(db.query(ExitRequest).order_by(ExitRequest.id.desc()).all())
