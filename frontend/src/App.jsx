@@ -138,11 +138,36 @@ function EmployeeDashboard() {
   );
 }
 
-function HrDashboard() {
+function HrDashboard({ user }) {
   const [requests, setRequests] = useState([]);
   const [dashboard, setDashboard] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [interviews, setInterviews] = useState({});
+  const [clearanceTasks, setClearanceTasks] = useState({});
+  const [interviewForms, setInterviewForms] = useState({});
+  const [clearanceForms, setClearanceForms] = useState({});
+
+  async function loadActivity(requestList) {
+    const interviewResults = await Promise.all(requestList.map(async (request) => {
+      try {
+        const response = await api.get(`/api/interviews/${request.id}`);
+        return [request.id, response.data.data];
+      } catch (err) {
+        return [request.id, null];
+      }
+    }));
+    const taskResults = await Promise.all(requestList.map(async (request) => {
+      try {
+        const response = await api.get(`/api/clearance-tasks/${request.id}`);
+        return [request.id, response.data.data];
+      } catch (err) {
+        return [request.id, []];
+      }
+    }));
+    setInterviews(Object.fromEntries(interviewResults));
+    setClearanceTasks(Object.fromEntries(taskResults));
+  }
 
   async function loadDashboard() {
     setError("");
@@ -151,8 +176,10 @@ function HrDashboard() {
         api.get("/api/exit-requests/all"),
         api.get("/api/dashboard"),
       ]);
-      setRequests(requestResponse.data.data);
+      const requestList = requestResponse.data.data;
+      setRequests(requestList);
       setDashboard(dashboardResponse.data.data);
+      await loadActivity(requestList);
     } catch (err) {
       setError(getErrorMessage(err, "Dashboard could not be loaded"));
     }
@@ -173,6 +200,82 @@ function HrDashboard() {
   const pendingActions = dashboard?.pending_actions || [];
   const recentRequests = dashboard?.recent_requests || [];
   const exitProgress = dashboard?.exit_progress || [];
+
+  async function createInterview(requestId) {
+    const form = interviewForms[requestId] || {};
+    if (!form.interview_date || !form.feedback) {
+      setError("Enter the interview date and feedback.");
+      return;
+    }
+    try {
+      await api.post(`/api/interviews/${requestId}`, form);
+      setMessage(`Exit interview recorded for request #${requestId}.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(getErrorMessage(err, "Interview could not be recorded"));
+    }
+  }
+
+  async function updateInterview(requestId) {
+    const interview = interviews[requestId];
+    const form = interviewForms[requestId] || interview || {};
+    try {
+      await api.put(`/api/interviews/${requestId}`, {
+        interview_date: form.interview_date,
+        feedback: form.feedback,
+      });
+      setMessage(`Exit interview updated for request #${requestId}.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(getErrorMessage(err, "Interview could not be updated"));
+    }
+  }
+
+  async function createClearanceTask(requestId) {
+    const task = clearanceForms[requestId]?.task?.trim();
+    if (!task) {
+      setError("Enter a clearance task.");
+      return;
+    }
+    try {
+      await api.post(`/api/clearance-tasks/${requestId}`, {
+        assigned_to: user.id,
+        task,
+      });
+      setClearanceForms({ ...clearanceForms, [requestId]: { task: "" } });
+      setMessage(`Clearance task created for request #${requestId}.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(getErrorMessage(err, "Clearance task could not be created"));
+    }
+  }
+
+  async function updateClearanceTask(taskId, requestId, status) {
+    try {
+      await api.put(`/api/clearance-tasks/${taskId}`, { status });
+      setMessage(`Clearance task updated for request #${requestId}.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(getErrorMessage(err, "Clearance task could not be updated"));
+    }
+  }
+
+  async function deleteClearanceTask(taskId, requestId) {
+    try {
+      await api.delete(`/api/clearance-tasks/${taskId}`);
+      setMessage(`Clearance task deleted for request #${requestId}.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(getErrorMessage(err, "Clearance task could not be deleted"));
+    }
+  }
+
+  function updateInterviewForm(requestId, field, value) {
+    setInterviewForms({
+      ...interviewForms,
+      [requestId]: { ...(interviewForms[requestId] || interviews[requestId] || {}), [field]: value },
+    });
+  }
 
   return (
     <section>
@@ -248,6 +351,45 @@ function HrDashboard() {
           <div>Last working day: {request.last_working_day}</div>
           <div className="mt-2">Status: {request.status}</div>
           {request.status === "Pending" && <div className="mt-3"><button className="btn btn-success me-2" onClick={() => processRequest(request.id, "Approved")}>Approve</button><button className="btn btn-outline-danger" onClick={() => processRequest(request.id, "Rejected")}>Reject</button></div>}
+
+          <div className="border-top mt-3 pt-3">
+            <h5>Exit Interview</h5>
+            {interviews[request.id] ? (
+              <>
+                <div className="small mb-2">Recorded date: {interviews[request.id].interview_date}</div>
+                <textarea className="form-control mb-2" value={(interviewForms[request.id] || interviews[request.id]).feedback || ""} onChange={(e) => updateInterviewForm(request.id, "feedback", e.target.value)} />
+                <input className="form-control mb-2" type="date" value={(interviewForms[request.id] || interviews[request.id]).interview_date || ""} onChange={(e) => updateInterviewForm(request.id, "interview_date", e.target.value)} />
+                <button className="btn btn-outline-primary btn-sm" onClick={() => updateInterview(request.id)}>Update Interview</button>
+              </>
+            ) : (
+              <>
+                <input className="form-control mb-2" type="date" value={interviewForms[request.id]?.interview_date || ""} onChange={(e) => updateInterviewForm(request.id, "interview_date", e.target.value)} />
+                <textarea className="form-control mb-2" placeholder="Interview feedback" value={interviewForms[request.id]?.feedback || ""} onChange={(e) => updateInterviewForm(request.id, "feedback", e.target.value)} />
+                <button className="btn btn-outline-primary btn-sm" onClick={() => createInterview(request.id)}>Record Interview</button>
+              </>
+            )}
+          </div>
+
+          <div className="border-top mt-3 pt-3">
+            <h5>Clearance Tasks</h5>
+            {(clearanceTasks[request.id] || []).map((task) => (
+              <div className="border rounded p-2 mb-2" key={task.id}>
+                <div><strong>{task.task}</strong> <span className="badge text-bg-secondary">{task.status}</span></div>
+                <div className="mt-2">
+                  <select className="form-select form-select-sm d-inline-block w-auto me-2" value={task.status} onChange={(e) => updateClearanceTask(task.id, request.id, e.target.value)}>
+                    <option>Pending</option>
+                    <option>Completed</option>
+                  </select>
+                  <button className="btn btn-outline-danger btn-sm" onClick={() => deleteClearanceTask(task.id, request.id)}>Delete</button>
+                </div>
+              </div>
+            ))}
+            <div className="input-group mt-2">
+              <input className="form-control" placeholder="New clearance task" value={clearanceForms[request.id]?.task || ""} onChange={(e) => setClearanceForms({ ...clearanceForms, [request.id]: { task: e.target.value } })} />
+              <button className="btn btn-outline-success" onClick={() => createClearanceTask(request.id)}>Add Task</button>
+            </div>
+            <div className="small text-secondary mt-1">New tasks are assigned to the signed-in HR user.</div>
+          </div>
         </div>
       ))}
     </section>
@@ -262,5 +404,5 @@ export default function App() {
     return <main className="container py-5"><h1 className="text-center mb-4">Employee Exit Management System</h1>{mode === "login" ? <Login onLogin={setUser} /> : <Signup onSignup={() => setMode("login")} />}<div className="text-center mt-3"><button className="btn btn-link" onClick={() => setMode(mode === "login" ? "signup" : "login")}>{mode === "login" ? "Create an account" : "Back to sign in"}</button></div></main>;
   }
 
-  return <main className="container py-5"><div className="d-flex justify-content-between align-items-center mb-4"><div><h1>Employee Exit Management System</h1><div className="text-secondary">Signed in as {user.name} ({user.role})</div></div><button className="btn btn-outline-secondary" onClick={() => { localStorage.removeItem("access_token"); setUser(null); }}>Sign Out</button></div>{user.role === "employee" ? <EmployeeDashboard /> : <HrDashboard />}</main>;
+  return <main className="container py-5"><div className="d-flex justify-content-between align-items-center mb-4"><div><h1>Employee Exit Management System</h1><div className="text-secondary">Signed in as {user.name} ({user.role})</div></div><button className="btn btn-outline-secondary" onClick={() => { localStorage.removeItem("access_token"); setUser(null); }}>Sign Out</button></div>{user.role === "employee" ? <EmployeeDashboard /> : <HrDashboard user={user} />}</main>;
 }
