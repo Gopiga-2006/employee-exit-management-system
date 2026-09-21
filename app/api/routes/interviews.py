@@ -11,7 +11,7 @@ from app.schemas.activity_schemas import (
     InterviewResponse,
     InterviewUpdate,
 )
-from app.services.activity_service import create_interview, update_interview
+from app.services.activity_service import create_interview as create_interview_service, update_interview as update_interview_service
 
 router = APIRouter(prefix="/api/interviews", tags=["Exit Interviews"])
 
@@ -29,7 +29,7 @@ def create_interview(
         raise HTTPException(status_code=404, detail="Exit request not found")
     if request.interview:
         raise HTTPException(status_code=400, detail="Interview already recorded")
-    interview = create_interview(
+    interview = create_interview_service(
         db, request_id, payload.interview_date, payload.feedback, user.id
     )
     data = InterviewResponse.model_validate(interview).model_dump()
@@ -61,7 +61,7 @@ def update_interview(
     interview = db.query(ExitInterview).filter(ExitInterview.request_id == request_id).first()
     if not interview:
         raise HTTPException(status_code=404, detail="Exit interview not found")
-    interview = update_interview(
+    interview = update_interview_service(
         db, interview, payload.interview_date, payload.feedback, user.id
     )
     data = InterviewResponse.model_validate(interview).model_dump()
