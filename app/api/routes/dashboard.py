@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/dashboard", tags=["Dashboard"])
 @router.get("")
 def get_dashboard(
     db: Session = Depends(get_db),
-    user: User = Depends(require_roles("hr", "admin")),
+    user: User = Depends(require_roles("hr")),
 ) -> dict[str, object]:
     """Return exit workflow summary information for HR users."""
     data = get_exit_dashboard_poc(db)
