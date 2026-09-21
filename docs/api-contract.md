@@ -16,9 +16,9 @@
 - `GET /api/exit-requests/all` for HR users
 
 ## Exit Approvals
-- `POST /api/approvals/{request_id}` — HR/admin.
-- `GET /api/approvals/{request_id}` — HR/admin.
-- `PUT /api/approvals/{approval_id}` — HR/admin.
+- `POST /api/approvals/{request_id}` — HR.
+- `GET /api/approvals/{request_id}` — HR.
+- `PUT /api/approvals/{approval_id}` — HR.
 
 ## Exit Interviews
 - `POST /api/interviews/{request_id}` for HR users
@@ -27,10 +27,10 @@
 ## Clearance Tasks
 - `POST /api/clearance-tasks/{request_id}` for HR users
 - `GET /api/clearance-tasks/{request_id}` for HR users
-- `PUT /api/clearance-tasks/{task_id}` — HR/admin.
-- `DELETE /api/clearance-tasks/{task_id}` — HR/admin.
+- `PUT /api/clearance-tasks/{task_id}` — HR.
+- `DELETE /api/clearance-tasks/{task_id}` — HR.
 
 ## HR Dashboard
-- `GET /api/dashboard` — HR/admin.
+- `GET /api/dashboard` — HR.
 
 FastAPI publishes the interactive API documentation at `/docs` when the backend is running.
