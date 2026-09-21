@@ -55,7 +55,8 @@ def request_signup_otp(
     )
     db.add(pending)
     db.commit()
-    send_otp_email(email, otp)
+    send_otp_email(email, otp, "Employee Exit Management System - Verification OTP")
+
 
 def request_password_reset_otp(db: Session, email: str, new_password: str) -> None:
     """Create a time-limited password reset OTP for an existing user."""
@@ -117,7 +118,6 @@ def verify_password_reset_otp(db: Session, email: str, otp: str) -> bool:
     db.delete(pending)
     db.commit()
     return True
-
 
 
 def verify_signup_otp(db: Session, email: str, otp: str) -> User | None:
