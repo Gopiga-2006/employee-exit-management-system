@@ -9,6 +9,7 @@ erDiagram
     USERS ||--o{ CLEARANCE_TASKS : assigned
     EXIT_REQUESTS ||--o{ CLEARANCE_TASKS : has
     USERS ||--o{ AUDIT_LOGS : creates
+    USERS ||--o{ OTP_VERIFICATIONS : owns
 
     USERS {
         int id PK
@@ -49,6 +50,17 @@ erDiagram
         int user_id FK
         string action
         string entity
+        datetime created_at
+    }
+    OTP_VERIFICATIONS {
+        int id PK
+        string name
+        string email
+        string password_hash
+        string role
+        string otp_hash
+        datetime expires_at
+        int attempts
         datetime created_at
     }
 ```
