@@ -1,11 +1,11 @@
 """Authentication endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user
 from app.core.database import get_db
-from sqlalchemy import select
 from app.core.security import create_access_token
 from app.models.entities import User
 from app.schemas.schemas import (
@@ -81,7 +81,7 @@ def forgot_password_request_otp(
     db: Session = Depends(get_db),
 ) -> dict:
     """Send a password reset OTP without revealing account existence."""
-    request_password_reset_otp(db, payload.email, "")
+    request_password_reset_otp(db, payload.email, payload.new_password)
     return {
         "success": True,
         "data": {"email": payload.email},
@@ -98,7 +98,6 @@ def forgot_password_verify_otp(
     user = db.scalar(select(User).where(User.email == payload.email))
     if not user:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
-    request_password_reset_otp(db, payload.email, payload.new_password)
     if not verify_password_reset_otp(db, payload.email, payload.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
     return {
