@@ -34,6 +34,7 @@ Design artifacts:
 ### Employee
 - Register with OTP verification and strong password validation
 - Sign in
+- Reset a forgotten password using email OTP
 - Submit an exit request
 - View own exit requests and statuses
 
