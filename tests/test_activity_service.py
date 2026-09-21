@@ -2,13 +2,12 @@
 
 from datetime import date
 
-from app.models.entities import ClearanceTask, ExitApproval, ExitInterview
+from app.models.entities import AuditLog, ClearanceTask, ExitApproval, ExitInterview
 from app.services.activity_service import (
     create_approval,
     create_clearance_task,
     create_interview,
     delete_clearance_task,
-    update_approval,
     update_clearance_task,
     update_interview,
 )
@@ -25,9 +24,8 @@ def test_approval_service_updates_request_and_audits(db_session):
 
     assert approval.decision == "Approved"
     assert db_session.get(type(request), request.id).status == "Approved"
-    audit = db_session.query(db_session.bind.mapper_registry if False else type(approval)).first()
     assert db_session.query(ExitApproval).count() == 1
-    assert db_session.query(__import__("app.models.entities", fromlist=["AuditLog"]).AuditLog).count() == 2
+    assert db_session.query(AuditLog).count() == 2
 
 
 def test_interview_service_creates_and_updates_record(db_session):
