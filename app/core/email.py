@@ -1,14 +1,20 @@
 """OTP email delivery helpers."""
 
+import base64
 import json
 import smtplib
 import urllib.error
 import urllib.request
 from email.message import EmailMessage
+from email.mime.text import MIMEText
 
 from app.core.config import (
     EMAIL_PROVIDER,
     ENVIRONMENT,
+    GMAIL_CLIENT_ID,
+    GMAIL_CLIENT_SECRET,
+    GMAIL_FROM,
+    GMAIL_REFRESH_TOKEN,
     RESEND_API_KEY,
     RESEND_FROM,
     SMTP_FROM,
@@ -17,6 +23,49 @@ from app.core.config import (
     SMTP_PORT,
     SMTP_USERNAME,
 )
+
+
+def _send_with_gmail(recipient: str, otp: str) -> None:
+    """Send an OTP through the Gmail API over HTTPS."""
+    from google.auth.transport.requests import Request
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+
+    if not all(
+        (
+            GMAIL_CLIENT_ID,
+            GMAIL_CLIENT_SECRET,
+            GMAIL_REFRESH_TOKEN,
+            GMAIL_FROM,
+        )
+    ):
+        raise RuntimeError("Gmail API settings must be configured for OTP delivery")
+
+    credentials = Credentials(
+        token=None,
+        refresh_token=GMAIL_REFRESH_TOKEN,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=GMAIL_CLIENT_ID,
+        client_secret=GMAIL_CLIENT_SECRET,
+        scopes=["https://www.googleapis.com/auth/gmail.send"],
+    )
+    credentials.refresh(Request())
+
+    message = MIMEText(
+        f"Your verification OTP is {otp}. It expires in 10 minutes.",
+        "plain",
+        "utf-8",
+    )
+    message["to"] = recipient
+    message["from"] = GMAIL_FROM
+    message["subject"] = "Employee Exit Management System - Verification OTP"
+
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+    service = build("gmail", "v1", credentials=credentials, cache_discovery=False)
+    service.users().messages().send(
+        userId="me",
+        body={"raw": raw_message},
+    ).execute()
 
 
 def _send_with_resend(recipient: str, otp: str) -> None:
@@ -70,6 +119,10 @@ def send_otp_email(recipient: str, otp: str) -> None:
 
     if provider == "console":
         print(f"Registration OTP for {recipient}: {otp}")
+        return
+
+    if provider == "gmail":
+        _send_with_gmail(recipient, otp)
         return
 
     if provider == "resend":
